@@ -13,7 +13,8 @@ export const assetTableColumns = [
         },
         style: {
             fontSize: '12px'
-        }
+        },
+        hidden: true
     },
     {
         dataField: 'status',
@@ -33,18 +34,25 @@ export const assetTableColumns = [
             fontSize: '12px'
         },
         formatter: (cellContent, row) => {
-            if (row.status === "Deployed") {
+            if (row.status === "Active") {
                 return (
-                    <p>
-                        <span className="badge rounded-pill bg-primary bg-gradient">Deployed</span>
-                    </p>
+                    <h6>
+                        <span className="badge rounded-pill bg-primary bg-gradient">Active</span>
+                    </h6>
+                );
+            }
+            else if (row.status === "Offline") {
+                return (
+                    <h6>
+                        <span className="badge rounded-pill bg-warning text-dark bg-gradient">Offline</span>
+                    </h6>
                 );
             }
             else if (row.status === "" || row.status === "Decommissioned") {
                 return (
-                    <p>
+                    <h6>
                         <span className="badge rounded-pill bg-danger bg-gradient">Decommissioned</span>
-                    </p>
+                    </h6>
                 );
             }
         }

@@ -1,11 +1,12 @@
-const sql = require('mssql');
-//const config = require('./dbConfig')
-const realConfig = require('./dbConfig')
+const { Pool } = require('pg');
+const config = require('./dbConfig')
+
+// Create a pool to manage database connections
+const pool = new Pool(config);
 
 
 // * SQL DATABASE TABLE CALLS * //
 
-// Can copy the SQL commands into MS Server to test the getters
 
 
 
@@ -20,9 +21,10 @@ const realConfig = require('./dbConfig')
 // -- Used in Asset Inventory homepage table
 const getAssets = async (req, res) => {
   try {
-    let pool = await sql.connect(realConfig);
-    let results = await pool.request().query("SELECT * FROM Asset_Inventory;");
-    res.json(results.recordset);
+    const client = await pool.connect();
+    const results = await client.query("SELECT * FROM Asset_Inventory;");
+    await res.json(results.rows);
+    await client.release();
   }
   catch (error) {
     console.log(error);
@@ -36,24 +38,24 @@ const getAssets = async (req, res) => {
 const getAssetById = async (req, res) => {
   try {
     const id = req.params.id;
-    let pool = await sql.connect(realConfig);
+    const client = await pool.connect();
 
-    // Define the SQL query to get the asset by ID
-    const query = `SELECT * FROM Asset_Inventory WHERE id = @id;`;
-
-    // Prepare the query parameters
-    const request = pool.request();
-    request.input('id', sql.Int, id)
-
-    // Execute the query
-    const result = await request.query(query);
-
-    if (result.recordset.length === 0) {
-      return res.status(404).json({ error: 'Asset not found' });
+    try {
+      // Define the SQL query to get the asset by ID
+      const query = 'SELECT * FROM Asset_Inventory WHERE id = $1;';
+  
+      // Execute the query
+      const result = await client.query(query, [id]);
+  
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Asset not found' });
+      }
+  
+      res.json(result.rows[0]);
+    } finally {
+      // Release the client back to the pool
+      client.release();
     }
-
-    res.json(result.recordset[0]);
-
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: 'Internal server error' });
@@ -63,188 +65,150 @@ const getAssetById = async (req, res) => {
 
 // Get all the ports attached to a specific asset
 // -- Used in View specific asset from asset Inventory home page when clicking on an asset
-getPortsPerAsset = async (req, res) => {
+const getPortsPerAsset = async (req, res) => {
   try {
     const id = req.params.id;
-    let pool = await sql.connect(realConfig);
+    const client = await pool.connect();
 
     // Define the SQL query to get the asset by ID
-    const query = `SELECT 
-                      Ports.number,
-                      Ports.name,
-                      Ports.allows,
-                      Ports.description,
-                      Ports_to_Asset.justification,
-                      Ports_to_Asset.vendor_docs
-                  FROM 
-                      Ports_to_Asset
-                  INNER JOIN
-                      Ports ON Ports.id = Ports_to_Asset.port_id
-                  INNER JOIN
-                      Asset_Inventory ON Asset_Inventory.id = Ports_to_Asset.asset_id
-                  WHERE asset_id = @id;`;
-
-    // Prepare the query parameters
-    const request = pool.request();
-    request.input('id', sql.Int, id)
+    const query = `
+      SELECT 
+        Ports.number,
+        Ports.name,
+        Ports.allows,
+        Ports.description,
+        Ports_to_Asset.justification,
+        Ports_to_Asset.vendor_docs
+      FROM 
+        Ports_to_Asset
+      INNER JOIN
+        Ports ON Ports.id = Ports_to_Asset.port_id
+      INNER JOIN
+        Asset_Inventory ON Asset_Inventory.id = Ports_to_Asset.asset_id
+      WHERE asset_id = $1;`;
 
     // Execute the query
-    const result = await request.query(query);
+    const result = await client.query(query, [id]);
 
-    // no error if results === 0, so that table will still render if empty port list
-
-    res.json(result.recordset);
-
+    // no error if results === 0, so that table will still render if the port list is empty
+    await res.json(result.rows);
+    await client.release();
+    
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }
+
 
 
 // Get all the applications attached to a specific asset
 // -- Used in View specific asset from asset Inventory home page when clicking on an asset
-getApplicationsPerAsset = async (req, res) => {
+const getApplicationsPerAsset = async (req, res) => {
   try {
     const id = req.params.id;
-    let pool = await sql.connect(realConfig);
+    const client = await pool.connect();
 
     // Define the SQL query to get the asset by ID
-    const query = `SELECT 
-                      Applications."name",
-                      Applications."type",
-                      Applications_to_Asset."version",
-                      Applications_to_Asset."initial_install",
-                      Applications_to_Asset."upgrade_date"
-                  FROM 
-                      Applications_to_Asset
-                  INNER JOIN
-                      Applications ON Applications.id = Applications_to_Asset.application_id
-                  INNER JOIN
-                      Asset_Inventory ON Asset_Inventory.id = Applications_to_Asset.asset_id
-                    WHERE asset_id = @id`;
-
-    // Prepare the query parameters
-    const request = pool.request();
-    request.input('id', sql.Int, id)
+    const query = `
+      SELECT 
+        Applications.name,
+        Applications.type,
+        Applications_to_Asset.version,
+        Applications_to_Asset.initial_install,
+        Applications_to_Asset.upgrade_date
+      FROM 
+        Applications_to_Asset
+      INNER JOIN
+        Applications ON Applications.id = Applications_to_Asset.application_id
+      INNER JOIN
+        Asset_Inventory ON Asset_Inventory.id = Applications_to_Asset.asset_id
+      WHERE asset_id = $1;`;
 
     // Execute the query
-    const result = await request.query(query);
+    const result = await client.query(query, [id]);
 
-    // no error if results === 0, so that table will still render if empty apps list
-
-    res.json(result.recordset);
+    // no error if results === 0, so that the table will still render if the apps list is empty
+    await res.json(result.rows);
+    await client.release();
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }
 
-
-
-
-
-
-////////////////////////// REVERTED BACK /////////////////////////////////////////////////////////////////////////////
 
 
 
 // Get all the software updates attached to a specific asset
 // -- Used in View specific asset from asset Inventory home page when clicking on an asset
-getUpdatesPerAsset = async (req, res) => {
+const getUpdatesPerAsset = async (req, res) => {
   try {
     const id = req.params.id;
-    let pool = await sql.connect(realConfig);
+    const client = await pool.connect();
 
     // Define the SQL query to get the asset by ID
-    const query = `SELECT 
-                      Software_Updates_to_Asset."patch_version",
-                      Software_Updates_to_Asset."source",
-                      Software_Updates_to_Asset.model,
-                      Software_Updates_to_Asset.OS,
-                      Software_Updates_to_Asset.date_reviewed,
-                      Software_Updates_to_Asset.date_installed,
-                      Software_Updates_to_Asset.CHG_ticket,
-                      Software_Updates_to_Asset.notes
-                  FROM 
-                      Software_Updates_to_Asset
-                  INNER JOIN
-                      Asset_Inventory ON Asset_Inventory.id = Software_Updates_to_Asset.asset_id
-                  WHERE 
-                      asset_id = @id
-                  ORDER BY
-                      Software_Updates_to_Asset.date_installed DESC;`;
-
-    // Prepare the query parameters
-    const request = pool.request();
-    request.input('id', sql.Int, id)
+    const query = `
+      SELECT 
+        Software_Updates_to_Asset.patch_version,
+        Software_Updates_to_Asset.source,
+        Software_Updates_to_Asset.model,
+        Software_Updates_to_Asset."OS",
+        Software_Updates_to_Asset.date_reviewed,
+        Software_Updates_to_Asset.date_installed,
+        Software_Updates_to_Asset."CHG_ticket",
+        Software_Updates_to_Asset.notes
+      FROM 
+        Software_Updates_to_Asset
+      INNER JOIN
+        Asset_Inventory ON Asset_Inventory.id = Software_Updates_to_Asset.asset_id
+      WHERE 
+        asset_id = $1
+      ORDER BY
+        Software_Updates_to_Asset.date_installed DESC;`;
 
     // Execute the query
-    const result = await request.query(query);
+    const result = await client.query(query, [id]);
 
-    // no error if results === 0, so that table will still render if empty apps list
-
-    res.json(result.recordset);
+    // no error if results === 0, so that the table will still render if the updates list is empty
+    await res.json(result.rows);
+    await client.release();
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }
 
-
-////////////////////////// REVERTED BACK /////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-////////////////////////// REVERTED BACK /////////////////////////////////////////////////////////////////////////////
 
 
 // Get the full list of all UNIQUE Change Controls found in the baseline
 // -- Used in Change Controls tab page
 const getChangeControls = async (req, res) => {
   try {
-    let pool = await sql.connect(realConfig);
-    // let results = await pool.request().query(
-    //   `SELECT 
-    //     CHG_ticket, 
-    //     date_reviewed, 
-    //     COUNT(DISTINCT patch_version) AS patches_included,
-    //     asset_type AS asset_type_affected
-    //   FROM 
-    //     Software_Updates_to_Asset
-    //   WHERE 
-    //     CHG_ticket IS NOT NULL
-    //   GROUP BY 
-    //     CHG_ticket, date_reviewed, asset_type
-    //   ORDER BY 
-    //     date_reviewed DESC;`
-    // );
+    const client = await pool.connect();
 
-    let results = await pool.request().query(
-      `SELECT
-        Change_Controls.CHG_number,
-        Change_Controls.CHG_date,
+    let results = await client.query(`
+      SELECT
+        Change_Controls."CHG_number",
+        Change_Controls."CHG_date",
         COUNT(DISTINCT Software_Updates_to_Asset.patch_version) AS patches_included,
         Change_Controls.security_update
       FROM
         Change_Controls
       LEFT JOIN
-        Software_Updates_to_Asset ON Software_Updates_to_Asset.CHG_ticket = Change_Controls.CHG_number
+        Software_Updates_to_Asset ON Software_Updates_to_Asset."CHG_ticket" = Change_Controls."CHG_number"
       GROUP BY
-        Change_Controls.CHG_number,
-        Change_Controls.CHG_date,
+        Change_Controls."CHG_number",
+        Change_Controls."CHG_date",
         Change_Controls.security_update
       ORDER BY
-        Change_Controls.CHG_date;`
+        Change_Controls."CHG_date";`
     );
 
-    res.json(results.recordset);
-
+    await res.json(results.rows);
+    await client.release();
   }
   catch (error) {
     console.log(error);
@@ -253,14 +217,7 @@ const getChangeControls = async (req, res) => {
 }
 
 
-////////////////////////// REVERTED BACK /////////////////////////////////////////////////////////////////////////////
 
-
-
-
-
-
-////////////////////////// REVERTED BACK /////////////////////////////////////////////////////////////////////////////
 
 
 // Get a specific Change Control's patches/KB's that it encompasses
@@ -268,43 +225,36 @@ const getChangeControls = async (req, res) => {
 const getChangeControlPatches = async (req, res) => {
   try {
     const CHG_ticket = req.params.CHG_ticket;
-    let pool = await sql.connect(realConfig);
+    const client = await pool.connect();
 
     // Define the SQL query to get the asset by ID
-    const query =
-      `SELECT DISTINCT 
+    const query = `
+      SELECT DISTINCT 
           Software_Updates_to_Asset.patch_version, 
           Software_Updates_to_Asset.source, 
           Software_Updates_to_Asset.date_reviewed, 
           Software_Updates_to_Asset.date_installed,			
-          Software_Updates_to_Asset.asset_type,
-          Software_Updates_to_Asset.CHG_ticket,
-          CASE
-              WHEN Software_Updates_to_Asset.asset_type = 'physical' THEN Software_Updates_to_Asset.model
-              WHEN Software_Updates_to_Asset.asset_type = 'virtual' THEN Software_Updates_to_Asset.OS
-          END AS "model/os",
+          Software_Updates_to_Asset."CHG_ticket",
           Software_Updates_to_Asset.notes
       FROM 
           Change_Controls
       LEFT JOIN
-          Software_Updates_to_Asset ON Change_Controls.CHG_number = Software_Updates_to_Asset.CHG_ticket
+          Software_Updates_to_Asset ON Change_Controls."CHG_number" = Software_Updates_to_Asset."CHG_ticket"
       WHERE 
-          CHG_number = @CHG_ticket
+          "CHG_number" = $1
       ORDER BY 
           date_reviewed DESC;`;
 
-    // Prepare the query parameters
-    const request = pool.request();
-    request.input('CHG_ticket', sql.VarChar, CHG_ticket)
 
     // Execute the query
-    const result = await request.query(query);
+    const result = await client.query(query, [CHG_ticket]);
 
-    if (result.recordset.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Change Control ticket not found' });
     }
 
-    res.json(result.recordset);
+    await res.json(result.rows);
+    await client.release();
 
   } catch (error) {
     console.log(error);
@@ -319,23 +269,20 @@ const getChangeControlPatches = async (req, res) => {
 const getChangeControlInfo = async (req, res) => {
   try {
     const CHG_ticket = req.params.CHG_ticket;
-    let pool = await sql.connect(realConfig);
+    const client = await pool.connect();
 
     // Define the SQL query to get the asset by ID
-    const query = `SELECT * FROM Change_Controls WHERE CHG_number = @CHG_ticket;`;
-
-    // Prepare the query parameters
-    const request = pool.request();
-    request.input('CHG_ticket', sql.VarChar, CHG_ticket)
+    const query = `SELECT * FROM Change_Controls WHERE "CHG_number" = $1;`;
 
     // Execute the query
-    const result = await request.query(query);
+    const result = await client.query(query, [CHG_ticket]);
 
-    if (result.recordset.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Change Control ticket not found' });
     }
 
-    res.json(result.recordset);
+    await res.json(result.rows);
+    await client.release();
 
   } catch (error) {
     console.log(error);
@@ -344,13 +291,6 @@ const getChangeControlInfo = async (req, res) => {
 };
 
 
-////////////////////////// REVERTED BACK /////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-////////////////////////// REVERTED BACK /////////////////////////////////////////////////////////////////////////////
 
 
 // Get the full list of all UNIQUE Software Updates found in the baseline

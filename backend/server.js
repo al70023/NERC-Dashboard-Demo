@@ -40,11 +40,11 @@ startServer(port);
 // FOR TESTING CONNECTION TO THE DATABASE //
 
 /*
-const sql           = require('mssql');
-const realConfig    = require('./dbConfig');
+const { Pool }      = require('pg');
+const config        = require('./dbConfig');
 
 // Create a pool to manage database connections
-const pool = new sql.ConnectionPool(realConfig);
+const pool = new Pool(config);
 const poolConnect = pool.connect();
 
 // Test the database connection
