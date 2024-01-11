@@ -1,0 +1,89 @@
+/* Small devices (up to 767px) */
+@media (max-width: 767px) {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+   
+  .App {
+    display: flex;
+    overflow-x: hidden;
+  }
+   
+  main {
+    padding: 20px;
+    width: 60%;
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+   
+  .App {
+    display: flex;
+    overflow-x: hidden;
+  }
+   
+  main {
+    padding: 20px;
+    width: 78%;
+  }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+   
+  .App {
+    display: flex;
+    overflow-x: hidden;
+  }
+   
+  main {
+    padding: 20px;
+    width: 83%;
+  }
+}
+
+/* X-Large devices (large desktops, 1200px and up) */
+@media (min-width: 1413px) {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+   
+  .App {
+    display: flex;
+    overflow-x: hidden;
+  }
+   
+  main {
+    padding: 20px;
+    width: 87%;
+  }
+}
+
+/* XXX-Large devices (larger desktops, 1905px and up) */
+@media (min-width: 1905px) {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+   
+  .App {
+    display: flex;
+    overflow-x: hidden;
+  }
+   
+  main {
+    padding: 20px;
+    width: 90%;
+  }
+} 

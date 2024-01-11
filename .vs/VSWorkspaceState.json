@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\backend",
+    "\\src",
+    "\\src\\pages",
+    "\\src\\pages\\assetInventoryPages",
+    "\\src\\tables\\changeControlTables"
+  ],
+  "SelectedNode": "\\backend\\dbAPI.js",
+  "PreviewInSolutionExplorer": false
+}

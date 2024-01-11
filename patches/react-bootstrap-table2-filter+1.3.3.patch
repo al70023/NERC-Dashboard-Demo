@@ -1,0 +1,14 @@
+diff --git a/node_modules/react-bootstrap-table2-filter/lib/src/components/text.js b/node_modules/react-bootstrap-table2-filter/lib/src/components/text.js
+index 0d34bb7..9a1b6ca 100644
+--- a/node_modules/react-bootstrap-table2-filter/lib/src/components/text.js
++++ b/node_modules/react-bootstrap-table2-filter/lib/src/components/text.js
+@@ -171,8 +171,7 @@ var TextFilter = function (_Component) {
+         _react2.default.createElement(
+           'span',
+           { className: 'sr-only' },
+-          'Filter by ',
+-          text
++          ''
+         ),
+         _react2.default.createElement('input', _extends({}, rest, {
+           ref: function ref(n) {
