@@ -6,9 +6,6 @@ Utilizing React, Node, Express, and PostgreSQL
 ## Table of contents
 * [Setup](#setup)
 * [Database Design](#database-design)
-
-## Database Design
-This project is simple Lorem ipsum dolor generator.
 	
 	
 ## Setup
@@ -26,3 +23,6 @@ $ npm start
 ```
 $ npm start
 ```
+
+
+## Database Design
