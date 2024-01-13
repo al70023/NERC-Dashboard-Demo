@@ -14,6 +14,7 @@ Utilizing React, Node, Express, and PostgreSQL.
 ## Table of contents
 * [Setup](#setup)
 * [Database Design](#database-design)
+* [Bugs](#bugs)
 	
 	
 ## Setup
@@ -40,3 +41,12 @@ You'll notice that Change_Controls table does not have any foreign keys or direc
 This was purely a personal choice of not limiting dependence between the two, and code independently looks up change controls in the latter table.
 
 ![ERD pgerd](https://github.com/al70023/NERC-Dashboard-Demo/assets/87347668/7f97d298-b664-444d-9e34-a2cebe796fcf)
+
+
+## Bugs
+1. Currently, running npm install in the root directory will reinstall a package being used for the table formatting: react-bootstrap-table-toolkit
+   This package has a bug that produces an error. I manually fixed the package, however, every npm install resets to old package downloaded online.
+   Thus, I keep the updated package as a seperate folder in the main directory, and drag a copy of it into my node_modules if I ever need to run npm install
+
+2. On Update Baseline (Existing Asset), if the last action taken on step 1 (change control information form) is to attach a screenshot, that screenshot will not persist in saved state.
+   Thus, last action when filling out the change control info form should be typing into some field, before moving on to next step.   
