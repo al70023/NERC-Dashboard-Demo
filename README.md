@@ -1,22 +1,28 @@
-## Table of contents
-* [General info](#general-info)
-* [Technologies](#technologies)
-* [Setup](#setup)
+# NERC IT Dashboard
+A full-stack web application meant to replace common IT dashboard's such as ServiceNow.
+Utilizing React, Node, Express, and PostgreSQL
 
-## General info
+
+## Table of contents
+* [Setup](#setup)
+* [Database Design](#database-design)
+
+## Database Design
 This project is simple Lorem ipsum dolor generator.
 	
-## Technologies
-Project is created with:
-* Lorem version: 12.3
-* Ipsum version: 2.33
-* Ament library version: 999
 	
 ## Setup
-To run this project, install it locally using npm:
+To run this project, open two terminals at the root directory.
+Navigate to the backend folder in one of the terminals.
+Then run npm start in both terminals.
 
+### Terminal 1:
 ```
-$ cd ../lorem
-$ npm install
+$ cd ../backend
+$ npm start
+```
+
+### Terminal 2:
+```
 $ npm start
 ```
