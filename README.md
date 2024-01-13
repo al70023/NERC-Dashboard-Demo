@@ -26,3 +26,4 @@ $ npm start
 
 
 ## Database Design
+![ERD pgerd](https://github.com/al70023/NERC-Dashboard-Demo/assets/87347668/7f97d298-b664-444d-9e34-a2cebe796fcf)
