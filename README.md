@@ -26,4 +26,9 @@ $ npm start
 
 
 ## Database Design
+Simple Entity-Relationship Diagram view of postgreSQL database powering this project.  
+  
+You'll notice that Change_Controls table does not have any foreign keys or direct associations with Software_Updates_to_Asset.  
+This was purely a personal choice of not limiting dependence between the two, and code independently looks up change controls in the latter table.
+
 ![ERD pgerd](https://github.com/al70023/NERC-Dashboard-Demo/assets/87347668/7f97d298-b664-444d-9e34-a2cebe796fcf)
