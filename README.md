@@ -1,6 +1,14 @@
 # NERC IT Dashboard
-A full-stack web application meant to replace common IT dashboard's such as ServiceNow.
-Utilizing React, Node, Express, and PostgreSQL
+A full-stack web application meant to replace common IT dashboard's such as ServiceNow.  
+The Dashboard allows for:
+- Detailed viewing between related entities
+- Navigation between repeated and related entries within various tables
+- Searching for values throughout the database tables
+- Generating of formatted PDF reports with user-selected filters
+- Intuitive updating of database through step-by-step process and error checking
+- Inserting new entries and deleting existing entries in the database
+     
+Utilizing React, Node, Express, and PostgreSQL.  
 
 
 ## Table of contents
