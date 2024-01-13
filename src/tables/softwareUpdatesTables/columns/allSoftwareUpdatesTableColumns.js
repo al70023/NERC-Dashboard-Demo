@@ -113,7 +113,7 @@ export const allSoftwareUpdatesTableColumns = [
         }
     },
     {
-        dataField: 'CHG_number',
+        dataField: 'CHG_ticket',
         text: 'Change Control',
         headerAlign: 'center',
         align: 'center',

@@ -2,14 +2,12 @@ import React, { Component, useEffect, useState } from 'react'
 import { withRouter } from '../../navigation/withRouter';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import PDFMerger from 'pdf-merger-js/browser';
 import Button from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
 import { Form, Row, Col, FloatingLabel } from "react-bootstrap";
 import { PDFDocument, PDFPage } from 'pdf-lib';
 import { saveAs } from 'file-saver';
 
-//import { Document, Page } from 'react-pdf';
 
 function ImageExists({ imagePath, alt, iframeSrc, width, height }) {
     const [imageExists, setImageExists] = useState(true);
@@ -401,7 +399,6 @@ export class SingleChangeControlInfo extends Component {
         // Embed the generated PDF
         const generatedCoverPdfDoc = await PDFDocument.load(generatedCoverPdfBytes);
         const generatedCoverPdfPages = generatedCoverPdfDoc.getPages();
-        console.log(generatedCoverPdfPages);
 
         const generatedTestPdfDoc = await PDFDocument.load(generatedTestPdfBytes);
         const generatedTestPdfPages = generatedTestPdfDoc.getPages();
@@ -636,7 +633,6 @@ export class SingleChangeControlInfo extends Component {
                         <Row className="mb-5">
                             <Col>
                                 <h6>Before Screenshot (Test)</h6>
-                                {console.log(this.state.savedData[0]?.before_test_ss)}
                                 {this.state.savedData[0]?.before_test_ss && (
                                     <ImageExists
                                         imagePath={require(`../../Evidence_Screenshots/${this.state.savedData[0].before_test_ss}`)}
@@ -652,11 +648,6 @@ export class SingleChangeControlInfo extends Component {
                             <Col>
                                 <h6>After Screenshot (Test)</h6>
                                 {this.state.savedData[0]?.after_test_ss && (
-                                    // <img
-                                    //     src={require(`../../Evidence_Screenshots/${this.state.savedData[0].after_test_ss}`)}
-                                    //     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                    //     alt="After Test Screenshot"
-                                    // />
                                     <ImageExists
                                         imagePath={require(`../../Evidence_Screenshots/${this.state.savedData[0].after_test_ss}`)}
                                         alt="After Test Screenshot"
@@ -702,11 +693,6 @@ export class SingleChangeControlInfo extends Component {
                             <Col>
                                 <h6>Before Screenshot (Production)</h6>
                                 {this.state.savedData[0]?.before_prod_ss && (
-                                    // <img
-                                    //     src={require(`../../Evidence_Screenshots/${this.state.savedData[0].before_prod_ss}`)}
-                                    //     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                    //     alt="Before Prod Screenshot"
-                                    // />
                                     <ImageExists
                                         imagePath={require(`../../Evidence_Screenshots/${this.state.savedData[0].before_prod_ss}`)}
                                         alt="Before Prod Screenshot"
@@ -720,11 +706,6 @@ export class SingleChangeControlInfo extends Component {
                             <Col>
                                 <h6>After Screenshot (Production)</h6>
                                 {this.state.savedData[0]?.after_prod_ss && (
-                                    // <img
-                                    //     src={require(`../../Evidence_Screenshots/${this.state.savedData[0]?.after_prod_ss}`)}
-                                    //     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                    //     alt="After Prod Screenshot"
-                                    // />
                                     <ImageExists
                                         imagePath={require(`../../Evidence_Screenshots/${this.state.savedData[0].after_prod_ss}`)}
                                         alt="After Prod Screenshot"

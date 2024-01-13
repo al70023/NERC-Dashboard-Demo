@@ -77,58 +77,6 @@ export const singleChangeControlPatchesColumns = [
         formatter: (cell, row) => formatDate(cell)
     },
     {
-        dataField: 'asset_type',
-        text: 'Asset Type Affected',
-        sort: true,
-        headerAlign: 'center',
-        align: 'center',
-        filter: textFilter({
-            placeholder: 'Search column...',
-            style: { fontSize: '10px', width: "130px" }
-        }),
-        headerStyle: {
-            fontSize: '12px',
-            width: '150px'
-        },
-        style: {
-            fontSize: '12px'
-        },
-        formatter: (cellContent, row) => {
-            if (row.asset_type === "physical") {
-                return (
-                    <h6>
-                        <span className="badge bg-warning text-dark">Physical</span>
-                    </h6>
-                );
-            }
-            else if (row.asset_type === "virtual") {
-                return (
-                    <h6>
-                        <span className="badge bg-info text-dark">Virtual</span>
-                    </h6>
-                );
-            }
-        }
-    },
-    {
-        dataField: 'model/os',
-        text: 'Model/OS',
-        headerAlign: 'center',
-        sort: true,
-        align: 'center',
-        filter: textFilter({
-            placeholder: 'Search column...',
-            style: { fontSize: '10px', width: "130px" }
-        }),
-        headerStyle: {
-            fontSize: '12px',
-            width: '150px'
-        },
-        style: {
-            fontSize: '12px'
-        }
-    },
-    {
         dataField: 'notes',
         text: 'Notes',
         headerAlign: 'center',

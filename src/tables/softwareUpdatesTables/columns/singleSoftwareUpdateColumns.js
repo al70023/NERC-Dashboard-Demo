@@ -72,21 +72,6 @@ export const singleSoftwareUpdateColumns = [
         },
         style: {
             fontSize: '12px'
-        },
-        formatter: (cellContent, row) => {
-            if (row.model_type === "Virtual" || row.model_type === "virtual") {
-                return (
-                    <h6>
-                        <span className="badge bg-info text-dark">Virtual</span>
-                    </h6>
-                );
-            } else if (row.model_type === "Physical" || row.model_type === "physical") {
-                return (
-                    <h6>
-                        <span className="badge bg-warning text-dark">Physical</span>
-                    </h6>
-                );
-            }
         }
     },
     {

@@ -531,7 +531,19 @@ CREATE TABLE change_controls (
 	"id" 					serial 			PRIMARY KEY,
 	"CHG_number" 			VARCHAR(256),
 	"CHG_date"		 		DATE,
-	"security_update"		VARCHAR(12)
+	"security_update"		VARCHAR(12),
+	"security_review_date"  DATE,
+	"description"			VARCHAR(256),
+	"test_approve_date"		DATE,
+	"test_install_date"		DATE,
+	"test_worknotes"		VARCHAR(256),
+	"before_test_ss"		VARCHAR(256),
+	"after_test_ss"			VARCHAR(256),
+	"prod_approve_date"		DATE,
+	"prod_install_date"		DATE,
+	"prod_worknotes"		VARCHAR(256),
+	"before_prod_ss"		VARCHAR(256),
+	"after_prod_ss"		VARCHAR(256)
 );
 
 
@@ -550,6 +562,27 @@ SET "security_update" = 'No'
 WHERE "id" IN (5, 6, 8, 10, 11, 12, 13, 14);
 
 
+UPDATE change_controls
+SET "security_review_date" = '2023-01-01'
+WHERE "security_update" = 'Yes';
+
+
+UPDATE change_controls
+SET "description" = 'This is a description of the work done by the change control....';
+
+UPDATE change_controls
+SET "test_approve_date" = '2023-01-01',
+"test_install_date" = '2023-01-07',
+"prod_approve_date" = '2023-01-14',
+"prod_install_date" = '2023-01-27',
+"test_worknotes" = 'Test environment successfully passed with no reported issues.',
+"prod_worknotes" = 'Production environment successfully updated with no issues.';
+
+UPDATE change_controls
+SET "before_test_ss" = 'example.pdf',
+"after_test_ss" = 'index.pdf',
+"before_prod_ss" = 'magic.pdf',
+"after_prod_ss" = 'sample.pdf';
 
 SELECT * FROM change_controls ORDER BY "CHG_date";
 

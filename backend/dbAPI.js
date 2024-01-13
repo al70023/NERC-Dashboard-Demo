@@ -297,16 +297,17 @@ const getChangeControlInfo = async (req, res) => {
 // -- Used in Software Updates tab page
 const getAllSoftwareUpdates = async (req, res) => {
   try {
-    let pool = await sql.connect(realConfig);
-    let results = await pool.request().query(
-      `SELECT DISTINCT
+    const client = await pool.connect();
+
+    const results = await client.query(`
+      SELECT DISTINCT
           Software_Updates_to_Asset."patch_version",
           Software_Updates_to_Asset."source",
           Software_Updates_to_Asset.model,
-          Software_Updates_to_Asset.OS,
+          Software_Updates_to_Asset."OS",
           Software_Updates_to_Asset.date_reviewed,
           Software_Updates_to_Asset.date_installed,
-          Software_Updates_to_Asset.CHG_ticket,
+          Software_Updates_to_Asset."CHG_ticket",
           Software_Updates_to_Asset.notes
       FROM 
           Software_Updates_to_Asset
@@ -318,7 +319,8 @@ const getAllSoftwareUpdates = async (req, res) => {
           Software_Updates_to_Asset."patch_version" DESC;`
     );
 
-    res.json(results.recordset);
+    await res.json(results.rows);
+    await client.release();
 
   }
   catch (error) {
@@ -328,61 +330,46 @@ const getAllSoftwareUpdates = async (req, res) => {
 }
 
 
-////////////////////////// REVERTED BACK /////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-////////////////////////// REVERTED BACK /////////////////////////////////////////////////////////////////////////////
 
 // Get list of all of the assets that a certain software update has affected
 // -- Used in Software Updates page, view specific software update
 getAssetsPerUpdate = async (req, res) => {
   try {
     const patch_version = req.params.patch_version;
-    let pool = await sql.connect(realConfig);
+
+    const client = await pool.connect();
 
     // Define the SQL query to get the asset by ID
-    const query = `SELECT 
-                        Asset_Inventory."name",
-                        Asset_Inventory."group",
-                        Asset_Inventory.IPs,
-                        Asset_Inventory.model_type,
-                        Asset_Inventory."function",
-                        Software_Updates_to_Asset.date_reviewed,
-                        Software_Updates_to_Asset.date_installed,
-                        Software_Updates_to_Asset.CHG_ticket,
-                        Asset_Inventory.id
-                    FROM 
-                        Software_Updates_to_Asset
-                    INNER JOIN
-                        Asset_Inventory ON Asset_Inventory.id = Software_Updates_to_Asset.asset_id
-                    WHERE 
-                      Software_Updates_to_Asset.patch_version = @patch_version;`;
-
-    // Prepare the query parameters
-    const request = pool.request();
-    request.input('patch_version', sql.VarChar, patch_version)
+    const query = `
+      SELECT 
+          Asset_Inventory."name",
+          Asset_Inventory."group",
+          Asset_Inventory."IPs",
+          Asset_Inventory.model_type,
+          Asset_Inventory."function",
+          Software_Updates_to_Asset.date_reviewed,
+          Software_Updates_to_Asset.date_installed,
+          Software_Updates_to_Asset."CHG_ticket",
+          Asset_Inventory.id
+      FROM 
+          Software_Updates_to_Asset
+      INNER JOIN
+          Asset_Inventory ON Asset_Inventory.id = Software_Updates_to_Asset.asset_id
+      WHERE 
+          Software_Updates_to_Asset.patch_version = $1;`;
 
     // Execute the query
-    const result = await request.query(query);
+    const result = await client.query(query, [patch_version]);
 
     // no error if results === 0, so that table will still render if empty list
-
-    res.json(result.recordset);
+    await res.json(result.rows);
+    await client.release();
 
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }
-
-////////////////////////// REVERTED BACK /////////////////////////////////////////////////////////////////////////////
-
-
-
 
 
 
@@ -391,12 +378,12 @@ getAssetsPerUpdate = async (req, res) => {
 // Get full list of ports from Ports table, which is a unique list of ports that can be attached to assets
 const getAllPorts = async (req, res) => {
   try {
-    let pool = await sql.connect(realConfig);
-    let results = await pool.request().query(
-      `SELECT *, '' AS "add_remove" FROM Ports;`
-    );
+    const client = await pool.connect();
 
-    res.json(results.recordset);
+    const results = await client.query(`SELECT *, '' AS "add_remove" FROM Ports;`);
+
+    await res.json(results.rows);
+    await client.release();
 
   }
   catch (error) {
@@ -411,46 +398,23 @@ const getAllPorts = async (req, res) => {
 // -- Used in UpdateBaselineStepper NewAssetInsert.js for selecting applications to add to your new asset
 const getAllApplications = async (req, res) => {
   try {
-    let pool = await sql.connect(realConfig);
-    // let results = await pool.request().query(
-    //   `WITH RankedApplications AS (
-    //     SELECT 
-    //         Applications.id,
-    //         Applications.name,
-    //         Applications.type,
-    //         Applications_to_Asset.version,
-    //         Applications_to_Asset.initial_install,
-    //         Applications_to_Asset.upgrade_date,
-    //         '' AS "add_upgrade_remove",
-    //         ROW_NUMBER() OVER(PARTITION BY Applications.name ORDER BY Applications.id) AS rn
-    //     FROM Applications
-    //     INNER JOIN Applications_to_Asset ON Applications.id = Applications_to_Asset.application_id
-    //   )
-    //   SELECT 
-    //       id,
-    //       name,
-    //       type,
-    //       version,
-    //       initial_install,
-    //       upgrade_date,
-    //       '' AS "add_upgrade_remove"
-    //   FROM RankedApplicatio  ns
-    //   WHERE rn = 1;`
-    // );
-    let results = await pool.request().query(
-      `SELECT id,
-              "name",
-              "type",
-              '' AS "version",
-              '' AS "initial_install",
-              '' AS "upgrade_date",
-              '' AS "add_upgrade_remove"
-        FROM Applications 
-        ORDER BY "name" 
-        ASC;`
+    const client = await pool.connect();
+
+    let results = await client.query(`
+      SELECT id,
+        "name",
+        "type",
+        '' AS "version",
+        '' AS "initial_install",
+        '' AS "upgrade_date",
+        '' AS "add_upgrade_remove"
+      FROM Applications 
+      ORDER BY "name" 
+      ASC;`
     )
 
-    res.json(results.recordset);
+    await res.json(results.rows);
+    await client.release();
 
   }
   catch (error) {
@@ -460,12 +424,14 @@ const getAllApplications = async (req, res) => {
 }
 
 
-// ----------- END OF GETTERS ------------ //
+// ------------------------------------- END OF GETTERS -------------------------------------------- //
 
 
 
 
-// ----------- INSERTERS ---------------- //
+
+
+// -------------------------------------- INSERTERS ----------------------------------------------- //
 
 
 // Insert a new asset into SQL database based on passed in optional parameters
@@ -474,7 +440,7 @@ const getAllApplications = async (req, res) => {
 const insertAsset = async (req, res) => {
   try {
 
-    let pool = await sql.connect(config);
+    const client = await pool.connect();
 
     const {
       SerialNumber,
@@ -496,105 +462,74 @@ const insertAsset = async (req, res) => {
       Team,
       Owner,
       CommissionDate,
-      DecommissionDate } = req.body
+      DecommissionDate 
+    } = req.body;
 
     // Define the SQL query
-    const query = `INSERT INTO Asset_Inventory 
-                    (
-                      serial_number, 
-                      "name", 
-                      IPs, 
-                      "function", 
-                      model_type, 
-                      manufacturer, 
-                      model, 
-                      OS, 
-                      "group", 
-                      bes_class, 
-                      impact_rating, 
-                      "status", 
-                      rack, 
-                      "location", 
-                      psp_id, 
-                      esp_id, 
-                      team, 
-                      tech_owner, 
-                      commission_date, 
-                      decommission_date
-                    ) 
-                    VALUES 
-                    (
-                      @SerialNumber, 
-                      @Name, 
-                      @IPs, 
-                      @Function, 
-                      @Type, 
-                      @Manufacturer,
-                      @Model, 
-                      @OS, 
-                      @Group, 
-                      @BESClass, 
-                      @Impact, 
-                      @Status, 
-                      @Rack, 
-                      @Location, 
-                      @PSPid, 
-                      @ESPid, 
-                      @Team, 
-                      @Owner, 
-                      @CommissionDate, 
-                      @DecommissionDate
-                      );`
-      ;
+    const query = 
+    `INSERT INTO Asset_Inventory 
+      (
+        "serial_number", 
+        "name", 
+        "IPs", 
+        "function", 
+        "model_type", 
+        "manufacturer", 
+        "model", 
+        "OS", 
+        "group", 
+        "bes_class", 
+        "impact_rating", 
+        "status", 
+        "rack", 
+        "location", 
+        "psp_id", 
+        "esp_id", 
+        "team", 
+        "tech_owner", 
+        "commission_date", 
+        "decommission_date"
+      ) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+      RETURNING id;
+    `;
 
-    // Prepare the query parameters
-    const request = pool.request();
+    // Prepare the query parameters with the values from req.body
+    const params = [
+      SerialNumber,
+      Name,
+      IPs,
+      Function,
+      Type,
+      Manufacturer,
+      Model,
+      OS,
+      Group,
+      BESClass,
+      Impact,
+      Status,
+      Rack,
+      Location,
+      PSPid,
+      ESPid,
+      Team,
+      Owner,
+      CommissionDate || null,
+      DecommissionDate || null,
+    ];
 
-    request.input('SerialNumber', sql.VarChar, SerialNumber);
-    request.input('Name', sql.VarChar, Name);
-    request.input('IPs', sql.VarChar, IPs);
-    request.input('Function', sql.VarChar, Function);
-    request.input('Type', sql.VarChar, Type);
-    request.input('Manufacturer', sql.VarChar, Manufacturer);
-    request.input('Model', sql.VarChar, Model);
-    request.input('OS', sql.VarChar, OS);
-    request.input('Group', sql.VarChar, Group);
-    request.input('BESClass', sql.VarChar, BESClass);
-    request.input('Impact', sql.VarChar, Impact);
-    request.input('Status', sql.VarChar, Status);
-    request.input('Rack', sql.VarChar, Rack);
-    request.input('Location', sql.VarChar, Location);
-    request.input('PSPid', sql.VarChar, PSPid);
-    request.input('ESPid', sql.VarChar, ESPid);
-    request.input('Team', sql.VarChar, Team);
-    request.input('Owner', sql.VarChar, Owner);
+    // Execute the query and get the inserted asset_id
+    const result = await client.query(query, params);
+    const inserted_asset_id = result.rows[0].id; // Assuming 'id' is the returning column from the INSERT statement
 
-    // Check and handle commissionDate and decommissionDate
-    if (CommissionDate) {
-      request.input('CommissionDate', sql.Date, CommissionDate);
-    } else {
-      request.input('CommissionDate', sql.Date, null);
-    }
-    if (DecommissionDate) {
-      request.input('DecommissionDate', sql.Date, DecommissionDate);
-    } else {
-      request.input('DecommissionDate', sql.Date, null);
-    }
-
-    // Execute the query
-    await request.query(query);
-
-    // Get the inserted asset_id
-    const result = await pool.request().query('SELECT @@IDENTITY AS inserted_asset_id;');
-    const inserted_asset_id = await result.recordset[0].inserted_asset_id;
-
-    // Close the connection pool
-    await pool.close();
+    // Close the client connection
+    await client.release();
 
     // Respond with a success message
     res.status(200).json({ message: 'Asset inserted successfully.', inserted_asset_id });
 
   } catch (err) {
+    client.release();
     console.error('Error inserting asset:', err.message);
     res.status(500).json({ message: 'Failed to insert asset.' });
   }
@@ -604,17 +539,13 @@ const insertAsset = async (req, res) => {
 
 
 
-////////////////////////// TO CHANGE THIS /////////////////////////////////////////////////////////////////////////////
-
 
 // Insert a new change control into SQL database based on passed in parameters
 // -- Used in UpdateBaselineStepper NewAssetStepper.js and ExistingAssetStepper.js
-// old way: Ties the change control to the newly created asset, through a single patch_version within that CHG called 'New Deploy'
 const insertCHG = async (req, res) => {
+  const client = await pool.connect();
+
   try {
-
-    let pool = await sql.connect(config);
-
     const {
       change_control,
       date_opened,
@@ -631,304 +562,131 @@ const insertCHG = async (req, res) => {
       test_after_screenshot,
       prod_before_screenshot,
       prod_after_screenshot
-    } = req.body
+    } = req.body;
 
-    // Define the SQL query
-    const query = `INSERT INTO Change_Controls 
-                (
-                  CHG_number, 
-                  CHG_date,  
-                  security_update, 
-                  security_review_date, 
-                  description,
-                  test_approve_date, 
-                  test_install_date, 
-                  test_worknotes, 
-                  before_test_ss, 
-                  after_test_ss, 
-                  prod_approve_date, 
-                  prod_install_date, 
-                  prod_worknotes, 
-                  before_prod_ss, 
-                  after_prod_ss
-                )
-                VALUES
-                (
-                  @change_control,
-                  @date_opened,
-                  @security_update,
-                  @security_review_date,
-                  @description,
-                  @test_approval_date,
-                  @test_install_date,
-                  @test_worknotes,
-                  @test_before_screenshot,
-                  @test_after_screenshot,
-                  @prod_approval_date,
-                  @prod_install_date,
-                  @prod_worknotes,
-                  @prod_before_screenshot,
-                  @prod_after_screenshot
-                );`
-      ;
+    const query = `
+      INSERT INTO Change_Controls (
+        "CHG_number", 
+        "CHG_date",  
+        security_update, 
+        security_review_date, 
+        description,
+        test_approve_date, 
+        test_install_date, 
+        test_worknotes, 
+        before_test_ss, 
+        after_test_ss, 
+        prod_approve_date, 
+        prod_install_date, 
+        prod_worknotes, 
+        before_prod_ss, 
+        after_prod_ss
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);
+    `;
 
-    // Prepare the query parameters
-    const request = pool.request();
+    // Prepare the values to be inserted
+    const values = [
+      change_control,
+      date_opened,
+      security_update,
+      security_review_date || null,
+      description,
+      test_approval_date || null,
+      test_install_date || null,
+      test_worknotes,
+      test_before_screenshot,
+      test_after_screenshot,
+      prod_approval_date || null,
+      prod_install_date || null,
+      prod_worknotes,
+      prod_before_screenshot,
+      prod_after_screenshot,
+    ];
 
-    
-    request.input('change_control', sql.VarChar, change_control);
-    request.input('date_opened', sql.Date, date_opened);
-    request.input('security_update', sql.VarChar, security_update);
+    // Execute the query with the values
+    await client.query(query, values);
 
-    if (security_review_date) {
-      request.input('security_review_date', sql.Date, security_review_date);
-    } else {
-      request.input('security_review_date', sql.Date, null);
-    }
-    
-    request.input('description', sql.Text, description);
-
-    if (test_approval_date) {
-      request.input('test_approval_date', sql.Date, test_approval_date);
-    } else {
-      request.input('test_approval_date', sql.Date, null);
-    }
-
-    if (test_install_date) {
-      request.input('test_install_date', sql.Date, test_install_date);
-    } else {
-      request.input('test_install_date', sql.Date, null);
-    }
-
-    request.input('test_worknotes', sql.Text, test_worknotes);
-    request.input('test_before_screenshot', sql.VarChar, test_before_screenshot);
-    request.input('test_after_screenshot', sql.VarChar, test_after_screenshot);
-
-    if (prod_approval_date) {
-      request.input('prod_approval_date', sql.Date, prod_approval_date);
-    } else {
-      request.input('prod_approval_date', sql.Date, null);
-    }
-
-    if (prod_install_date) {
-      request.input('prod_install_date', sql.Date, prod_install_date);
-    } else {
-      request.input('prod_install_date', sql.Date, null);
-    }
-
-    request.input('prod_worknotes', sql.Text, prod_worknotes);
-    request.input('prod_before_screenshot', sql.VarChar, prod_before_screenshot);
-    request.input('prod_after_screenshot', sql.VarChar, prod_after_screenshot);
-
-
-    // Execute the query
-    await request.query(query);
-
-    // Close the connection pool
-    await pool.close();
+    // Release the client back to the pool
+    client.release();
 
     // Respond with a success message
     res.status(200).json({ message: 'Change Control inserted successfully.' });
-
   } catch (err) {
+    // Release the client back to the pool in case of error
+    client.release();
     console.error('Error inserting change control:', err.message);
     res.status(500).json({ message: 'Failed to insert change control.' });
   }
-}
-
-
-////////////////////////// TO CHANGE THIS /////////////////////////////////////////////////////////////////////////////
+};
 
 
 
-
-
-////////////////////////// TO CHANGE THIS /////////////////////////////////////////////////////////////////////////////
-
-
-// Insert a new software update into SQL database based on passed in parameters
-// -- Used in UpdateBaselineStepper ExistingAssetStepper.js
-// Loops through the list of patches, and all have the same CHG affecting the various assets
-// const insertSoftwareUpdate = async (req, res) => {
-//   try {
-
-//     let pool = await sql.connect(config);
-
-//     const { asset_ids, patch_versions, sources, asset_types, models, OSs, dates_reviewed, dates_installed, change_controls, notes } = req.body
-
-//     // Define the SQL query
-//     const query = `INSERT INTO Software_Updates_to_Asset 
-//                     (asset_id, patch_version, source, asset_type, model, OS, date_reviewed, date_installed, CHG_ticket, notes) 
-//                   VALUES 
-//                     (
-//                       @asset_id, @patch_version, @source, @asset_type, @model, @OS, @date_reviewed, @date_installed, @change_control, @notes
-//                     );`
-//       ;
-
-//     // Check if asset_ids is an array (multiple assets having their patches added)
-//     if (Array.isArray(asset_ids)) {
-//       // Nested loop for multiple asset_ids
-//       for (const asset_id of asset_ids) {
-//         // Loop through the parallel arrays and insert each patch
-//         for (let i = 0; i < patch_versions.length; i++) {
-//           const request = pool.request();
-//           request.input('asset_id', sql.Int, asset_id);
-//           request.input('patch_version', sql.VarChar, patch_versions[i]);
-//           request.input('source', sql.VarChar, sources[i]);
-//           request.input('asset_type', sql.VarChar, asset_types[i]);
-//           request.input('model', sql.VarChar, models[i]);
-//           request.input('OS', sql.VarChar, OSs[i]);
-//           // Check and handle dates
-//           if (dates_reviewed[i]) {
-//             request.input('date_reviewed', sql.Date, dates_reviewed[i]);
-//           } else {
-//             request.input('date_reviewed', sql.Date, null);
-//           }
-//           if (dates_installed[i]) {
-//             request.input('date_installed', sql.Date, dates_installed[i]);
-//           } else {
-//             request.input('date_installed', sql.Date, null);
-//           }
-//           request.input('change_control', sql.VarChar, change_controls[i]);
-//           request.input('notes', sql.VarChar, notes[i]);
-
-//           // Execute the query for each application
-//           await request.query(query);
-//         }
-//       }
-//     } else {
-//       // Single asset_ids
-//       for (let i = 0; i < patch_versions.length; i++) {
-//         const request = pool.request();
-//         request.input('asset_id', sql.Int, asset_ids);
-//         request.input('patch_version', sql.VarChar, patch_versions[i]);
-//         request.input('source', sql.VarChar, sources[i]);
-//         request.input('asset_type', sql.VarChar, asset_types[i]);
-//         request.input('model', sql.VarChar, models[i]);
-//         request.input('OS', sql.VarChar, OSs[i]);
-//         // Check and handle dates
-//         if (dates_reviewed[i]) {
-//           request.input('date_reviewed', sql.Date, dates_reviewed[i]);
-//         } else {
-//           request.input('date_reviewed', sql.Date, null);
-//         }
-//         if (dates_installed[i]) {
-//           request.input('date_installed', sql.Date, dates_installed[i]);
-//         } else {
-//           request.input('date_installed', sql.Date, null);
-//         }
-//         request.input('change_control', sql.VarChar, change_controls[i]);
-//         request.input('notes', sql.VarChar, notes[i]);
-
-//         // Execute the query for each application
-//         await request.query(query);
-//       }
-//     }
-
-//     // Close the connection pool
-//     await pool.close();
-
-//     // Respond with a success message
-//     res.status(200).json({ message: 'Software Update inserted successfully.' });
-
-//   } catch (err) {
-//     console.error('Error inserting software update:', err.message);
-//     res.status(500).json({ message: 'Failed to insert software update.' });
-//   }
-// }
 
 const insertSoftwareUpdate = async (req, res) => {
+  const client = await pool.connect();
   try {
-    let pool = await sql.connect(config);
-
     const softwareUpdates = req.body; // Array of software update objects
 
     for (const softwareUpdate of softwareUpdates) {
-
       const { asset_ids, patch_version, source, model, os, date_reviewed, date_installed, CHG_ticket, notes } = softwareUpdate;
 
-      // Define the SQL query
-      const query = `INSERT INTO Software_Updates_to_Asset 
-                    (asset_id, patch_version, source, model, OS, date_reviewed, date_installed, CHG_ticket, notes) 
-                  VALUES 
-                    (
-                      @asset_id, @patch_version, @source, @model, @OS, @date_reviewed, @date_installed, @CHG_ticket, @notes
-                    );`;
+      // Define the SQL query with parameterized values for PostgreSQL
+      const query = `
+        INSERT INTO Software_Updates_to_Asset 
+        (asset_id, patch_version, source, model, "OS", date_reviewed, date_installed, "CHG_ticket", notes) 
+        VALUES 
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+      `;
 
       // Check if asset_ids is an array (multiple assets having their patches added)
       if (Array.isArray(asset_ids)) {
         // Nested loop for multiple asset_ids
         for (const asset_id of asset_ids) {
-          const request = pool.request();
-          request.input('asset_id', sql.Int, asset_id);
-          request.input('patch_version', sql.VarChar, patch_version);
-          request.input('source', sql.VarChar, source);
-          request.input('model', sql.VarChar, model);
-          request.input('OS', sql.VarChar, os);
-          // Check and handle dates
-          if (date_reviewed) {
-            request.input('date_reviewed', sql.Date, date_reviewed);
-          } else {
-            request.input('date_reviewed', sql.Date, null);
-          }
-          if (date_installed) {
-            request.input('date_installed', sql.Date, date_installed);
-          } else {
-            request.input('date_installed', sql.Date, null);
-          }
-          request.input('CHG_ticket', sql.VarChar, CHG_ticket);
-          request.input('notes', sql.VarChar, notes);
+          const values = [
+            asset_id,
+            patch_version,
+            source,
+            model,
+            os,
+            date_reviewed || null,
+            date_installed || null,
+            CHG_ticket,
+            notes,
+          ];
 
-          // Execute the query for each application
-          await request.query(query);
-          
+          await client.query(query, values);
         }
       } else {
-        // Single asset_ids
-        for (let i = 0; i < patch_versions.length; i++) {
-          const request = pool.request();
-          request.input('asset_id', sql.Int, asset_id);
-          request.input('patch_version', sql.VarChar, patch_version);
-          request.input('source', sql.VarChar, source);
-          request.input('model', sql.VarChar, model);
-          request.input('OS', sql.VarChar, os);
-          // Check and handle dates
-          if (date_reviewed) {
-            request.input('date_reviewed', sql.Date, date_reviewed);
-          } else {
-            request.input('date_reviewed', sql.Date, null);
-          }
-          if (date_installed) {
-            request.input('date_installed', sql.Date, date_installed);
-          } else {
-            request.input('date_installed', sql.Date, null);
-          }
-          request.input('CHG_ticket', sql.VarChar, CHG_ticket);
-          request.input('notes', sql.VarChar, notes);
+        // Single asset_id
+        const values = [
+          asset_ids,
+          patch_version,
+          source,
+          model,
+          os,
+          date_reviewed || null,
+          date_installed || null,
+          CHG_ticket,
+          notes,
+        ];
 
-          // Execute the query for each application
-          await request.query(query);
-        }
+        await client.query(query, values);
       }
     }
 
-    // Close the connection pool
-    await pool.close();
+    // Release the client back to the pool
+    client.release();
 
     // Respond with a success message
     res.status(200).json({ message: 'Software Updates inserted successfully.' });
 
   } catch (err) {
+    // Release the client back to the pool in case of error
+    client.release();
     console.error('Error inserting software updates:', err.message);
     res.status(500).json({ message: 'Failed to insert software updates.' });
   }
-}
-
-
-
-////////////////////////// TO CHANGE THIS /////////////////////////////////////////////////////////////////////////////
-
-
+};
 
 
 
@@ -942,45 +700,35 @@ const insertSoftwareUpdate = async (req, res) => {
 //          (asset_id, port_id_3)...
 // -- Used in UpdateBaselineStepper NewAssetStepper.js
 const insertAssetPorts = async (req, res) => {
+  const client = await pool.connect();
   try {
-    const pool = await sql.connect(config);
     const { asset_ids, port_ids } = req.body;
 
-    // Prepare the SQL query
-    const query = `INSERT INTO Ports_to_Asset (asset_id, port_id) VALUES (@asset_id, @port_id);`;
+    // Prepare the SQL query with parameterized values for PostgreSQL
+    const query = `INSERT INTO Ports_to_Asset (asset_id, port_id) VALUES ($1, $2);`;
 
     // Check if asset_ids is an array (multiple assets having their ports added)
     if (Array.isArray(asset_ids)) {
       // Nested loop for multiple asset_ids
       for (const asset_id of asset_ids) {
         for (const port_id of port_ids) {
-          const request = pool.request();
-          request.input('asset_id', sql.Int, asset_id);
-          request.input('port_id', sql.Int, port_id);
-
-          // Execute the query for each port_id and asset_id combination
-          await request.query(query);
+          await client.query(query, [asset_id, port_id]);
         }
       }
     } else {
       // Single asset_id
       for (const port_id of port_ids) {
-        const request = pool.request();
-        request.input('asset_id', sql.Int, asset_ids);
-        request.input('port_id', sql.Int, port_id);
-
-        // Execute the query for each port_id
-        await request.query(query);
+        await client.query(query, [asset_ids, port_id]);
       }
     }
 
-    // Close the connection pool
-    await pool.close();
+    client.release();
 
-    // Respond with a success message
     res.status(200).json({ message: 'Ports attached successfully.' });
 
   } catch (err) {
+    // Release the client back to the pool in case of error
+    client.release();
     console.error('Error attaching ports:', err.message);
     res.status(500).json({ message: 'Failed to attach ports.' });
   }
@@ -997,13 +745,14 @@ const insertAssetPorts = async (req, res) => {
 // -- Used in UpdateBaselineStepper NewAssetStepper.js (single asset_id)
 // -- Also used in ExistingAssetStepper.js (can have multiple asset_id's)
 const insertAssetApplications = async (req, res) => {
+  const client = await pool.connect();
   try {
-    const pool = await sql.connect(config);
     const { asset_ids, application_ids, application_versions, application_install_dates, application_upgrade_dates } = req.body;
 
-    // Prepare the SQL query
-    const query = `INSERT INTO Applications_to_Asset (asset_id, application_id, version, initial_install, upgrade_date) 
-      VALUES (@asset_id, @application_id, @version, @initial_install, @upgrade_date);`;
+    // Prepare the SQL query with parameterized values for PostgreSQL
+    const query = `INSERT INTO Applications_to_Asset 
+      (asset_id, application_id, version, initial_install, upgrade_date) 
+      VALUES ($1, $2, $3, $4, $5);`;
 
     // Check if asset_ids is an array (multiple assets having their applications added)
     if (Array.isArray(asset_ids)) {
@@ -1011,39 +760,43 @@ const insertAssetApplications = async (req, res) => {
       for (const asset_id of asset_ids) {
         // Loop through the parallel arrays and insert each application
         for (let i = 0; i < application_ids.length; i++) {
-          const request = pool.request();
-          request.input('asset_id', sql.Int, asset_id);
-          request.input('application_id', sql.Int, application_ids[i]);
-          request.input('version', sql.VarChar, application_versions[i]);
-          request.input('initial_install', sql.Date, new Date(application_install_dates[i]));
-          request.input('upgrade_date', sql.Date, new Date(application_upgrade_dates[i]));
+          const values = [
+            asset_id,
+            application_ids[i],
+            application_versions[i],
+            application_install_dates[i] ? new Date(application_install_dates[i]) : null,
+            application_upgrade_dates[i] ? new Date(application_upgrade_dates[i]) : null,
+          ];
 
           // Execute the query for each application
-          await request.query(query);
+          await client.query(query, values);
         }
       }
     } else {
       // Single asset_ids
       for (let i = 0; i < application_ids.length; i++) {
-        const request = pool.request();
-        request.input('asset_id', sql.Int, asset_ids);
-        request.input('application_id', sql.Int, application_ids[i]);
-        request.input('version', sql.VarChar, application_versions[i]);
-        request.input('initial_install', sql.Date, new Date(application_install_dates[i]));
-        request.input('upgrade_date', sql.Date, new Date(application_upgrade_dates[i]));
+        const values = [
+          asset_ids,
+          application_ids[i],
+          application_versions[i],
+          application_install_dates[i] ? new Date(application_install_dates[i]) : null,
+          application_upgrade_dates[i] ? new Date(application_upgrade_dates[i]) : null,
+        ];
 
         // Execute the query for each application
-        await request.query(query);
+        await client.query(query, values);
       }
     }
 
-    // Close the connection pool
-    await pool.close();
+    // Release the client back to the pool
+    client.release();
 
     // Respond with a success message
     res.status(200).json({ message: 'Applications attached successfully.' });
 
   } catch (err) {
+    // Release the client back to the pool in case of error
+    client.release();
     console.error('Error attaching applications:', err.message);
     res.status(500).json({ message: 'Failed to attach applications.' });
   }
@@ -1051,12 +804,15 @@ const insertAssetApplications = async (req, res) => {
 
 
 
-// ----------- END OF INSERTERS ------------ //
+// -------------------------------------- END OF INSERTERS -------------------------------------- //
 
 
 
 
-// ----------- UPDATERS ------------------ //
+
+
+
+// --------------------------------------- UPDATERS -------------------------------------------- //
 
 
 // Update applications to an inserted asset in SQL database based on passed in parameters
@@ -1068,22 +824,22 @@ const insertAssetApplications = async (req, res) => {
 // -- Used in UpdateBaselineStepper NewAssetStepper.js (single asset_id)
 // -- Also used in ExistingAssetStepper.js (can have multiple asset_id's)
 const updateAssetApplications = async (req, res) => {
+  const client = await pool.connect();
   try {
-    const pool = await sql.connect(config);
     const { asset_ids, application_ids, application_versions, application_install_dates, application_upgrade_dates } = req.body;
 
-    // Prepare the SQL query
-    const query =
-      `UPDATE Applications_to_Asset 
+    // Prepare the SQL query with parameterized values for PostgreSQL
+    const query = `
+      UPDATE Applications_to_Asset 
       SET 
-        version = @version,
-        initial_install = @initial_install,
-        upgrade_date = @upgrade_date 
+        version = $3,
+        initial_install = $4,
+        upgrade_date = $5 
       WHERE 
-        asset_id = @asset_id
+        asset_id = $1
       AND
-        application_id = @application_id;`
-      ;
+        application_id = $2;
+    `;
 
     // Check if asset_ids is an array (multiple assets having their applications upgraded)
     if (Array.isArray(asset_ids)) {
@@ -1091,39 +847,39 @@ const updateAssetApplications = async (req, res) => {
       for (const asset_id of asset_ids) {
         // Loop through the parallel arrays and upgrade each application
         for (let i = 0; i < application_ids.length; i++) {
-          const request = pool.request();
-          request.input('asset_id', sql.Int, asset_id);
-          request.input('application_id', sql.Int, application_ids[i]);
-          request.input('version', sql.VarChar, application_versions[i]);
-          request.input('initial_install', sql.Date, new Date(application_install_dates[i]));
-          request.input('upgrade_date', sql.Date, new Date(application_upgrade_dates[i]));
+          const values = [
+            asset_id,
+            application_ids[i],
+            application_versions[i],
+            application_install_dates[i] ? new Date(application_install_dates[i]) : null,
+            application_upgrade_dates[i] ? new Date(application_upgrade_dates[i]) : null,
+          ];
 
-          // Execute the query for each application
-          await request.query(query);
+          await client.query(query, values);
         }
       }
     } else {
       // Single asset_ids
       for (let i = 0; i < application_ids.length; i++) {
-        const request = pool.request();
-        request.input('asset_id', sql.Int, asset_ids);
-        request.input('application_id', sql.Int, application_ids[i]);
-        request.input('version', sql.VarChar, application_versions[i]);
-        request.input('initial_install', sql.Date, new Date(application_install_dates[i]));
-        request.input('upgrade_date', sql.Date, new Date(application_upgrade_dates[i]));
+        const values = [
+          asset_ids,
+          application_ids[i],
+          application_versions[i],
+          application_install_dates[i] ? new Date(application_install_dates[i]) : null,
+          application_upgrade_dates[i] ? new Date(application_upgrade_dates[i]) : null,
+        ];
 
-        // Execute the query for each application
-        await request.query(query);
+        await client.query(query, values);
       }
     }
 
-    // Close the connection pool
-    await pool.close();
+    client.release();
 
-    // Respond with a success message
     res.status(200).json({ message: 'Applications upgraded successfully.' });
 
   } catch (err) {
+    // Release the client back to the pool in case of error
+    client.release();
     console.error('Error upgrading applications:', err.message);
     res.status(500).json({ message: 'Failed to upgrade applications.' });
   }
@@ -1135,131 +891,102 @@ const updateAssetApplications = async (req, res) => {
 // The arrays should be parallel
 // -- Used in ExistingAssetStepper.js (can have multiple asset_id's)
 const updateAssetById = async (req, res) => {
+  const client = await pool.connect();
   try {
-    const pool = await sql.connect(config);
-    const { asset_ids, names, serial_numbers, IPs, OSs, teams, tech_owners, model_types, manufacturers, models, groups, bes_classes, impact_ratings, racks, locations, psp_ids, esp_ids, functions, statuses,
-      commission_dates, decommission_dates } = req.body;
+    const {
+      asset_ids, names, serial_numbers, IPs, OSs, teams, tech_owners, model_types, manufacturers, models, groups, bes_classes, impact_ratings, racks, locations, psp_ids, esp_ids, functions, statuses,
+      commission_dates, decommission_dates
+    } = req.body;
 
-    // Prepare the SQL query
-    const query =
-      `UPDATE Asset_Inventory 
+    // Prepare the SQL query with parameterized values for PostgreSQL
+    const query = `
+      UPDATE Asset_Inventory 
       SET 
-        "name" = @name,
-        serial_number = @serial_number,
-        IPs = @IPs,
-        OS = @OS,
-        team = @team,
-        tech_owner = @tech_owner,
-        model_type = @model_type,
-        manufacturer = @manufacturer,
-        model = @model,
-        "group" = @group,
-        bes_class = @bes_class,
-        impact_rating = @impact_rating,
-        rack = @rack,
-        "location" = @location,
-        psp_id = @psp_id,
-        esp_id = @esp_id,
-        "function" = @function,
-        "status" = @status,
-        commission_date = @commission_date,
-        decommission_date = @decommission_date
+        "name" = $2,
+        "serial_number" = $3,
+        "IPs" = $4,
+        "OS" = $5,
+        "team" = $6,
+        "tech_owner" = $7,
+        "model_type" = $8,
+        "manufacturer" = $9,
+        "model" = $10,
+        "group" = $11,
+        "bes_class" = $12,
+        "impact_rating" = $13,
+        "rack" = $14,
+        "location" = $15,
+        "psp_id" = $16,
+        "esp_id" = $17,
+        "function" = $18,
+        "status" = $19,
+        "commission_date" = $20,
+        "decommission_date" = $21
       WHERE 
-        id = @asset_id;`
-      ;
+        "id" = $1;
+    `;
 
     for (let i = 0; i < asset_ids.length; i++) {
-      const request = pool.request();
-      request.input('asset_id', sql.Int, asset_ids[i]);
-      request.input('name', sql.VarChar, names[i]);
-      request.input('serial_number', sql.VarChar, serial_numbers[i]);
-      request.input('IPs', sql.VarChar, IPs[i]);
-      request.input('OS', sql.VarChar, OSs[i]);
-      request.input('team', sql.VarChar, teams[i]);
-      request.input('tech_owner', sql.VarChar, tech_owners[i]);
-      request.input('model_type', sql.VarChar, model_types[i]);
-      request.input('manufacturer', sql.VarChar, manufacturers[i]);
-      request.input('model', sql.VarChar, models[i]);
-      request.input('group', sql.VarChar, groups[i]);
-      request.input('bes_class', sql.VarChar, bes_classes[i]);
-      request.input('impact_rating', sql.VarChar, impact_ratings[i]);
-      request.input('rack', sql.VarChar, racks[i]);
-      request.input('location', sql.VarChar, locations[i]);
-      request.input('psp_id', sql.VarChar, psp_ids[i]);
-      request.input('esp_id', sql.VarChar, esp_ids[i]);
-      request.input('function', sql.VarChar, functions[i]);
-      request.input('status', sql.VarChar, statuses[i]);
-      request.input('commission_date', sql.Date, new Date(commission_dates[i]));
-      request.input('decommission_date', sql.Date, new Date(decommission_dates[i]));
+      const values = [
+        asset_ids[i], names[i], serial_numbers[i], IPs[i], OSs[i], teams[i], tech_owners[i],
+        model_types[i], manufacturers[i], models[i], groups[i], bes_classes[i], impact_ratings[i],
+        racks[i], locations[i], psp_ids[i], esp_ids[i], functions[i], statuses[i],
+        commission_dates[i] ? new Date(commission_dates[i]) : null,
+        decommission_dates[i] ? new Date(decommission_dates[i]) : null
+      ];
 
-      // Execute the query for each application
-      await request.query(query);
+      await client.query(query, values);
     }
 
-    // Close the connection pool
-    await pool.close();
+    client.release();
 
-    // Respond with a success message
     res.status(200).json({ message: 'Asset info updated successfully.' });
 
   } catch (err) {
+    // Release the client back to the pool in case of error
+    client.release();
     console.error('Error updating assets:', err.message);
     res.status(500).json({ message: 'Failed to update assets.' });
   }
 };
 
 
-// -------------- END OF UPDATERS ---------- //
+// ------------------------------------- END OF UPDATERS ---------------------------------------- //
 
 
 
 
 
-// ----------- DELETERS ------------ //
+// --------------------------------------- DELETERS ------==------------------------------------ //
 
 
 
-
-////////////////////////// TO CHANGE THIS /////////////////////////////////////////////////////////////////////////////
 
 
 const deleteAssetById = async (req, res) => {
+  const client = await pool.connect();
   try {
     const id = req.params.id;
-    let pool = await sql.connect(realConfig);
 
-    // Define the SQL query to delete the asset by ID
-    const query =
-      `DELETE FROM Applications_to_Asset WHERE asset_id = @id;
-     DELETE FROM Ports_to_Asset WHERE asset_id = @id;
-     DELETE FROM Software_Updates_to_Asset WHERE asset_id = @id;
-     DELETE FROM Asset_Inventory WHERE id = @id;`;
+    // Define the SQL queries to delete the asset by ID
+    await client.query('DELETE FROM Applications_to_Asset WHERE asset_id = $1;', [id]);
+    await client.query('DELETE FROM Ports_to_Asset WHERE asset_id = $1;', [id]);
+    await client.query('DELETE FROM Software_Updates_to_Asset WHERE asset_id = $1;', [id]);
+    const result = await client.query('DELETE FROM Asset_Inventory WHERE "id" = $1;', [id]);
 
-    // Prepare the query parameters
-    const request = pool.request();
-    request.input('id', sql.Int, id);
-
-    // Execute the query
-    const result = await request.query(query);
-
-    // Check if any rows were affected (i.e., asset with the given ID was found and deleted)
-    if (result.rowsAffected[0] === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Asset not found' });
     }
 
-    // Close the connection pool
-    await pool.close();
-
-    // Respond with a success message
+    client.release();
     res.status(200).json({ message: 'Asset deleted successfully.' });
 
   } catch (error) {
+    client.release();
     console.error('Error deleting asset:', error.message);
     res.status(500).json({ error: 'Failed to delete asset.' });
   }
 };
-
-////////////////////////// TO CHANGE THIS /////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -1274,49 +1001,34 @@ const deleteAssetById = async (req, res) => {
 //          (asset_id, port_id_3)...
 // -- Used in UpdateBaselineStepper ExistingAssetStepper.js
 const removeAssetPorts = async (req, res) => {
+  const client = await pool.connect();
   try {
-    const pool = await sql.connect(config);
     const { asset_ids, port_ids } = req.body;
+    const query = 'DELETE FROM Ports_to_Asset WHERE asset_id = $1 AND port_id = $2;';
 
-    // Prepare the SQL query
-    const query = `DELETE FROM Ports_to_Asset where asset_id = @asset_id AND port_id = @port_id;`;
-
-    // Check if asset_ids is an array (multiple assets having their ports removed)
     if (Array.isArray(asset_ids)) {
-      // Nested loop for multiple asset_ids
       for (const asset_id of asset_ids) {
         for (const port_id of port_ids) {
-          const request = pool.request();
-          request.input('asset_id', sql.Int, asset_id);
-          request.input('port_id', sql.Int, port_id);
-
-          // Execute the query for each port_id and asset_id combination
-          await request.query(query);
+          await client.query(query, [asset_id, port_id]);
         }
       }
     } else {
-      // Single asset_id
       for (const port_id of port_ids) {
-        const request = pool.request();
-        request.input('asset_id', sql.Int, asset_ids);
-        request.input('port_id', sql.Int, port_id);
-
-        // Execute the query for each port_id
-        await request.query(query);
+        await client.query(query, [asset_ids, port_id]);
       }
     }
 
-    // Close the connection pool
-    await pool.close();
-
-    // Respond with a success message
+    client.release();
     res.status(200).json({ message: 'Ports removed successfully.' });
 
   } catch (err) {
+    client.release();
     console.error('Error removing ports:', err.message);
     res.status(500).json({ message: 'Failed to remove ports.' });
   }
 };
+
+
 
 
 // Remove applications from an inserted asset in SQL database based on passed in parameters
@@ -1326,53 +1038,37 @@ const removeAssetPorts = async (req, res) => {
 //          (asset_id, port_id_3)...
 // -- Used in UpdateBaselineStepper ExistingAssetStepper.js
 const removeAssetApplications = async (req, res) => {
+  const client = await pool.connect();
+
   try {
-    const pool = await sql.connect(config);
     const { asset_ids, application_ids } = req.body;
+    const query = 'DELETE FROM Applications_to_Asset WHERE asset_id = $1 AND application_id = $2;';
 
-    // Prepare the SQL query
-    const query = `DELETE FROM Applications_to_Asset where asset_id = @asset_id AND application_id = @application_id;`;
-
-    // Check if asset_ids is an array (multiple assets having their applications removed)
     if (Array.isArray(asset_ids)) {
-      // Nested loop for multiple asset_ids
       for (const asset_id of asset_ids) {
         for (const application_id of application_ids) {
-          const request = pool.request();
-          request.input('asset_id', sql.Int, asset_id);
-          request.input('application_id', sql.Int, application_id);
-
-          // Execute the query for each port_id and asset_id combination
-          await request.query(query);
+          await client.query(query, [asset_id, application_id]);
         }
       }
     } else {
-      // Single asset_id
       for (const application_id of application_ids) {
-        const request = pool.request();
-        request.input('asset_id', sql.Int, asset_ids);
-        request.input('application_id', sql.Int, application_id);
-
-        // Execute the query for each port_id
-        await request.query(query);
+        await client.query(query, [asset_ids, application_id]);
       }
     }
 
-    // Close the connection pool
-    await pool.close();
-
-    // Respond with a success message
+    client.release();
     res.status(200).json({ message: 'Applications removed successfully.' });
 
   } catch (err) {
+    client.release();
     console.error('Error removing applications:', err.message);
     res.status(500).json({ message: 'Failed to remove applications.' });
   }
 };
 
-// ----------- END OF DELETERS ------------ //
 
 
+// ----------------------------------------- END OF DELETERS ----------------------------------------- //
 
 
 

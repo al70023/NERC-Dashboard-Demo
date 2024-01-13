@@ -39,7 +39,6 @@ export class ChgTable extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props)
         fetch('http://localhost:3001/ChangeControls')
             .then(res => res.json())
             .then(json => {
