@@ -8,7 +8,6 @@ import { Form, FloatingLabel, Row, Col } from "react-bootstrap";
 
 export default function IpInventoryReport() {
     const [ipInventory, setIpInventory] = useState([]);
-    const [teamFilterCriteria, setTeamFilterCriteria] = useState("Show All");
     const [groupFilterCriteria, setGroupFilterCriteria] = useState("Show All");
 
     useEffect(() => {
@@ -23,9 +22,6 @@ export default function IpInventoryReport() {
         // Filter the data based on the selected criteria
         let filteredData = ipInventory;
 
-        if (teamFilterCriteria !== "Show All") {
-            filteredData = filteredData.filter(row => row.team === teamFilterCriteria);
-        }
         if (groupFilterCriteria !== "Show All") {
             filteredData = filteredData.filter(row => row.group === groupFilterCriteria);
         }
@@ -101,19 +97,7 @@ export default function IpInventoryReport() {
                             <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12">
                                 <Form onSubmit={(e) => e.preventDefault()}>
                                     <Row>
-                                        <Col>
-                                            <FloatingLabel controlId="formGridTeam" label="Team">
-                                                <Form.Select
-                                                    value={teamFilterCriteria}
-                                                    onChange={(e) => setTeamFilterCriteria(e.target.value)}
-                                                    style={{ marginBottom: "10px" }}
-                                                >
-                                                    <option value="Show All">Show All</option>
-                                                    <option value="Network">Network</option>
-                                                    <option value="Systems">Systems</option>
-                                                </Form.Select>
-                                            </FloatingLabel>
-                                        </Col>
+                                        <Form.Group xs={2} as={Col} controlId="formGridSpace"></Form.Group>
                                         <Col>
                                             <FloatingLabel controlId="formGridGroup" label="Group">
                                                 <Form.Select
@@ -122,28 +106,13 @@ export default function IpInventoryReport() {
                                                     style={{ marginBottom: "10px" }}
                                                 >
                                                     <option value="Show All">Show All</option>
-                                                    <option value="Network Firewall">Network Firewall</option>
-                                                    <option value="Network Switches">Network Switches</option>
-                                                    <option value="Network Term Server">Network Term Server</option>
-                                                    <option value="TACACS Server">TACACS Server</option>
-                                                    <option value="KVM">KVM</option>
-                                                    <option value="Badge System S2">Badge System S2</option>
-                                                    <option value="SSL VPN">SSL VPN</option>
-                                                    <option value="SafeNet 2F">SafeNet 2F</option>
-                                                    <option value="RDS">RDS</option>
-                                                    <option value="Domain Controller">Domain Controller</option>
-                                                    <option value="Need to change name to CrushFTP">Need to change name to CrushFTP</option>
-                                                    <option value="REMS Core">REMS Core</option>
-                                                    <option value="REMS Workstations">REMS Workstations</option>
-                                                    <option value="VMHosts New">VMHosts New</option>
-                                                    <option value="VMHosts Old">VMHosts Old</option>
-                                                    <option value="SQL Servers">SQL Servers</option>
-                                                    <option value="LogRhythm Servers">LogRhythm Servers</option>
-                                                    <option value="IT Infrastructure">IT Infrastructure</option>
-                                                    <option value="Workstations">Workstations</option>
+                                                    <option value="IT Equipment">IT Equipment</option>
+                                                    <option value="Networking Equipment">Networking Equipment</option>
+                                                    <option value="Office Equipment">Office Equipment</option>
                                                 </Form.Select>
                                             </FloatingLabel>
                                         </Col>
+                                        <Form.Group xs={2} as={Col} controlId="formGridSpace"></Form.Group>
                                     </Row>
                                     <br></br>
                                     <Row>

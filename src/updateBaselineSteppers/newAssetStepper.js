@@ -49,7 +49,7 @@ export default function NewAssetStepper() {
         setNewCHGInfo({});
         
         // Redirect to another page after all the operations are complete
-        window.location.replace('/updateBaseline');
+        window.location.replace(`/changeControls/${newCHGInfo.ChangeControl}`);
     };
 
     const insertAsset = async () => {
@@ -109,10 +109,10 @@ export default function NewAssetStepper() {
                 prod_approval_date:       newCHGInfo.ProdApprovalDate,
                 prod_install_date:        newCHGInfo.ProdInstallDate,
                 prod_worknotes:           newCHGInfo.ProdWorknotes,
-                test_before_screenshot:   newCHGInfo.TestBeforeScreenshot.name,
-                test_after_screenshot:    newCHGInfo.TestAfterScreenshot.name,
-                prod_before_screenshot:   newCHGInfo.ProdBeforeScreenshot.name,
-                prod_after_screenshot:    newCHGInfo.ProdAfterScreenshot.name
+                test_before_screenshot:   newCHGInfo.TestBeforeScreenshot,
+                test_after_screenshot:    newCHGInfo.TestAfterScreenshot,
+                prod_before_screenshot:   newCHGInfo.ProdBeforeScreenshot,
+                prod_after_screenshot:    newCHGInfo.ProdAfterScreenshot
             }
 
             const CHGresponse = await fetch('http://localhost:3001/ChangeControls/insertCHG', {

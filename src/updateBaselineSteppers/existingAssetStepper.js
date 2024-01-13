@@ -30,7 +30,6 @@ import SelectedAssetsEditableTable from '../tables/updateBaselineTables/selected
 
 import NewCHGForm from './forms/newCHGForm';
 
-import SelectedAssetsCheckboxTable from '../tables/updateBaselineTables/selectedTables/selectedAssetsCheckboxTable';
 
 
 const steps = ['Change Control Information', 'Select Assets', 'Port Configuration', 'Applications Installed', 'Software Updates', 'Modify Status', 'Submit'];
@@ -75,7 +74,7 @@ export default function ExistingAssetStepper() {
     let isChangeControl = false;
     let chg_ticket = "";
 
-    if (newCHGInfo) {
+    if (changeControlRadio != "") {
       chg_ticket = newCHGInfo.ChangeControl;
       isChangeControl = true;
     }
