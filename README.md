@@ -43,6 +43,14 @@ This was purely a personal choice of not limiting dependence between the two, an
 ![ERD pgerd](https://github.com/al70023/NERC-Dashboard-Demo/assets/87347668/7f97d298-b664-444d-9e34-a2cebe796fcf)
 
 
+
+## AWS Cloud Network Architecture
+Cloud Netowrk Design Diagram of cloud implementation of this project (current migration WIP).     
+
+![network diagram drawio](https://github.com/al70023/NERC-Dashboard-Demo/assets/87347668/2e00c9d3-30ae-4ee0-93b7-830033033a44)
+
+
+
 ## Bugs
 1. Currently, running npm install in the root directory will reinstall a package being used for the table formatting: `react-bootstrap-table2-toolkit`      
    This package has a bug that produces an error. I manually fixed the package, however, every npm install resets to old package downloaded online.
