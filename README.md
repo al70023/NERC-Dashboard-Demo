@@ -1,70 +1,57 @@
-# Getting Started with Create React App
+# NERC IT Dashboard
+A full-stack web application meant to replace common IT dashboard's such as ServiceNow.  
+The Dashboard allows for:
+- Detailed viewing between related entities
+- Navigation between repeated and related entries within various tables
+- Searching for values throughout the database tables
+- Generating of formatted PDF reports with user-selected filters
+- Intuitive updating of database through step-by-step process and error checking
+- Inserting new entries and deleting existing entries in the database
+     
+Utilizing React, Node, Express, and PostgreSQL.  
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Table of contents
+* [Setup](#setup)
+* [Database Design](#database-design)
+* [Bugs](#bugs)
+	
+	
+## Setup
+To run this project, open two terminals at the root directory.
+Navigate to the backend folder in one of the terminals.
+Then run npm start in both terminals.
 
-In the project directory, you can run:
+### Terminal 1:
+```
+$ cd ../backend
+$ npm start
+```
 
-### `npm start`
+### Terminal 2:
+```
+$ npm start
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Database Design
+Simple Entity-Relationship Diagram view of postgreSQL database powering this project.  
+  
+You'll notice that Change_Controls table does not have any foreign keys or direct associations with Software_Updates_to_Asset.  
+This was purely a personal choice of not limiting dependence between the two, and code independently looks up change controls in the latter table.
 
-### `npm test`
+![ERD pgerd](https://github.com/al70023/NERC-Dashboard-Demo/assets/87347668/7f97d298-b664-444d-9e34-a2cebe796fcf)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+## Bugs
+1. Currently, running npm install in the root directory will reinstall a package being used for the table formatting: `react-bootstrap-table2-toolkit`      
+   This package has a bug that produces an error. I manually fixed the package, however, every npm install resets to old package downloaded online.
+   Thus, I keep the updated package as a seperate folder in the main directory, and drag a copy of it into my node_modules if I ever need to run npm install.    
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. On Update Baseline (Existing Asset), if the last action taken on step 1 (change control information form) is to attach a screenshot, that screenshot will not persist in saved state.   
+   Thus, last action when filling out the change control info form should be typing into some field, before moving on to next step.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. On Reports, Whole Baseline Report has no functionality (haven't implemented yet).  
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+4. On Update Baseline stepper, when selecting Ports to modify, "Add Port" button has no function (haven't implemented yet).  
+   
