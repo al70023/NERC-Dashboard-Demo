@@ -62,5 +62,7 @@ Cloud Netowrk Design Diagram of cloud implementation of this project (current mi
 
 3. On Reports, Whole Baseline Report has no functionality (haven't implemented yet).  
 
-4. On Update Baseline stepper, when selecting Ports to modify, "Add Port" button has no function (haven't implemented yet).  
+4. On Update Baseline stepper, when selecting Ports to modify, "Add Port" button has no function (haven't implemented yet).   
+   
+5. Implement responsiveness to UI
    
