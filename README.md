@@ -14,6 +14,7 @@ Utilizing React, Node, Express, and PostgreSQL.
 ## Table of contents
 * [Setup](#setup)
 * [Database Design](#database-design)
+* [AWS Cloud Network Architecture](#aws-cloud-network-architecture)
 * [Bugs](#bugs)
 	
 	
