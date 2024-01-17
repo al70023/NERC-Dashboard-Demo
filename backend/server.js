@@ -39,9 +39,10 @@ startServer(port);
 
 // FOR TESTING CONNECTION TO THE DATABASE //
 
-/*
+
 const { Pool }      = require('pg');
 const config        = require('./dbConfig');
+
 
 // Create a pool to manage database connections
 const pool = new Pool(config);
@@ -55,7 +56,7 @@ poolConnect
   .catch((err) => {
     console.error('Error connecting to the database:', err);
   });
-*/
+
 
 
 
