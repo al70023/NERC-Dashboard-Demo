@@ -96,7 +96,10 @@ app.post('/upload', upload.single('file'), (req, res) => {
   res.json({ message: 'File uploaded successfully', fileName: generatedFileName });
 });
 
-
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).send('Server is healthy');
+});
 
 
 // Route to get all assets in database
