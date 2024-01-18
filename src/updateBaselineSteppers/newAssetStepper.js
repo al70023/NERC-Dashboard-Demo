@@ -54,7 +54,7 @@ export default function NewAssetStepper() {
 
     const insertAsset = async () => {
         try {
-            const response = await fetch('http://localhost:3001/AssetInventory/insert', {
+            const response = await fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory/insert', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newAssetInfo)
@@ -68,7 +68,7 @@ export default function NewAssetStepper() {
                 port_ids: selectedPortIds
             };
 
-            const portResponse = await fetch('http://localhost:3001/AssetInventory/insertPorts', {
+            const portResponse = await fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory/insertPorts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(portData)
@@ -89,7 +89,7 @@ export default function NewAssetStepper() {
                 application_upgrade_dates: selectedApplicationUpgrades
             }
 
-            const applicationResponse = await fetch('http://localhost:3001/AssetInventory/insertApplications', {
+            const applicationResponse = await fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory/insertApplications', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(applicationData)
@@ -115,7 +115,7 @@ export default function NewAssetStepper() {
                 prod_after_screenshot:    newCHGInfo.ProdAfterScreenshot
             }
 
-            const CHGresponse = await fetch('http://localhost:3001/ChangeControls/insertCHG', {
+            const CHGresponse = await fetch(process.env.REACT_APP_BACKEND_URL + '/ChangeControls/insertCHG', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(CHGData)

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express         = require('express');
 const cors            = require('cors');
 const multer          = require('multer'); // Middleware for handling file uploads
@@ -8,7 +9,7 @@ const { v4: uuidv4 }  = require('uuid'); // For generating unique file names
 const dbAPI           = require('./dbAPI');
 
 const app             = express();
-const port            = 3001;
+const port            = process.env.BACKEND_PORT;
 
 
 app.use(express.json());

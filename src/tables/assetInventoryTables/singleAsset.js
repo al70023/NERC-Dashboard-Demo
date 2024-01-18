@@ -17,7 +17,7 @@ export class SingleAsset extends Component {
     componentDidMount() {
         const { params } = this.props;
         const id = params.id;
-        fetch(`http://localhost:3001/AssetInventory/${id}`)
+        fetch(process.env.REACT_APP_BACKEND_URL + `/AssetInventory/${id}`)
             .then((res) => res.json())
             .then((json) => {
                 // console.log(json);
@@ -32,7 +32,7 @@ export class SingleAsset extends Component {
             method: 'DELETE'
         };
 
-        fetch(`http://localhost:3001/AssetInventory/delete/${id}`, requestOptions)
+        fetch(process.env.REACT_APP_BACKEND_URL + `/AssetInventory/delete/${id}`, requestOptions)
             .then(res => res.json())
             .then(() => {
                 // Perform any actions after successful delete

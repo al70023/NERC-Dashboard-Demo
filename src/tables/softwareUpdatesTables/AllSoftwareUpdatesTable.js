@@ -39,7 +39,7 @@ export class AllSoftwareUpdatesTable extends Component {
     }
 
     componentDidMount() {
-        fetch(`http://localhost:3001/SoftwareUpdates`)
+        fetch(process.env.REACT_APP_BACKEND_URL + `/SoftwareUpdates`)
             .then((res) => res.json())
             .then((json) => {
                 // console.log(json);

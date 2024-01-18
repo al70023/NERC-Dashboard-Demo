@@ -18,7 +18,7 @@ export class PortsTableUpdateBaseline extends Component {
     }
 
     componentDidMount() {
-        fetch('http://localhost:3001/Ports')
+        fetch(process.env.REACT_APP_BACKEND_URL + '/Ports')
             .then(res => res.json())
             .then(json => {
                 // console.log(json);

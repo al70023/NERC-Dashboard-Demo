@@ -137,7 +137,7 @@ export default function ExistingAssetStepper() {
           prod_after_screenshot:    newCHGInfo.ProdAfterScreenshot
         }
 
-        const CHGresponse = await fetch('http://localhost:3001/ChangeControls/insertCHG', {
+        const CHGresponse = await fetch(process.env.REACT_APP_BACKEND_URL + '/ChangeControls/insertCHG', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(CHGData)
@@ -164,7 +164,7 @@ export default function ExistingAssetStepper() {
             port_ids: selectedPortIdsToAdd
           };
 
-          const portAddResponse = await fetch('http://localhost:3001/AssetInventory/insertPorts', {
+          const portAddResponse = await fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory/insertPorts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(portDataToAdd)
@@ -185,7 +185,7 @@ export default function ExistingAssetStepper() {
             port_ids: selectedPortIdsToRemove
           };
 
-          const portRemoveResponse = await fetch('http://localhost:3001/AssetInventory/removePorts', {
+          const portRemoveResponse = await fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory/removePorts', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(portDataToRemove)
@@ -230,7 +230,7 @@ export default function ExistingAssetStepper() {
             application_upgrade_dates: selectedApplicationUpgradesToAdd
           };
 
-          const applicationAddResponse = await fetch('http://localhost:3001/AssetInventory/insertApplications', {
+          const applicationAddResponse = await fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory/insertApplications', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(applicationDataToAdd)
@@ -267,7 +267,7 @@ export default function ExistingAssetStepper() {
             application_upgrade_dates: selectedApplicationUpgradesToUpgrade
           };
 
-          const applicationUpgradeResponse = await fetch('http://localhost:3001/AssetInventory/updateApplications', {
+          const applicationUpgradeResponse = await fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory/updateApplications', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(applicationDataToUpgrade)
@@ -288,7 +288,7 @@ export default function ExistingAssetStepper() {
             application_ids: selectedApplicationIdsToRemove
           };
 
-          const applicationRemoveResponse = await fetch('http://localhost:3001/AssetInventory/removeApplications', {
+          const applicationRemoveResponse = await fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory/removeApplications', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(applicationDataToRemove)
@@ -330,26 +330,6 @@ export default function ExistingAssetStepper() {
         const softwareUpdatesNotes = softwareUpdates
           .map(softwareUpdate => softwareUpdate.notes);
 
-
-        // const softwareUpdateData = {
-        //   asset_ids:       selectedAssetIds,
-        //   patch_versions:  softwareUpdatesPatchVersions,
-        //   sources:         softwareUpdatesSources,
-        //   asset_types:     softwareUpdatesAssetTypes,
-        //   models:          softwareUpdatesModels,
-        //   OSs:             softwareUpdatesOS,
-        //   dates_reviewed:  softwareUpdatesDatesReviewed,
-        //   dates_installed: softwareUpdatesDatesInstalled,
-        //   change_controls: softwareUpdatesChangeControls,
-        //   notes:           softwareUpdatesNotes
-        // }
-
-        // const softwareUpdateResponse = await fetch('http://localhost:3001/AssetInventory/insertSoftwareUpdate', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(softwareUpdateData)
-        // });
-
         const softwareUpdateData = softwareUpdates.map(softwareUpdate => {
           const softwareUpdateObject = {
             asset_ids:        softwareUpdate.assetIds, // Array of asset IDs for this software update
@@ -370,7 +350,7 @@ export default function ExistingAssetStepper() {
 
         
         
-        const softwareUpdateResponse = await fetch('http://localhost:3001/AssetInventory/insertSoftwareUpdate', {
+        const softwareUpdateResponse = await fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory/insertSoftwareUpdate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(softwareUpdateData),
@@ -473,7 +453,7 @@ export default function ExistingAssetStepper() {
           decommission_dates: assetDecommissionDates
         }
 
-        const assetUpdateStatusResponse = await fetch('http://localhost:3001/AssetInventory/update/:id', {
+        const assetUpdateStatusResponse = await fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory/update/:id', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(assetUpdateStatusData)

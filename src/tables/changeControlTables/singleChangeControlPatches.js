@@ -16,7 +16,7 @@ export class SingleChangeControlPatches extends Component {
     componentDidMount() {
         const { params } = this.props;
         const CHG_ticket = params.CHG_ticket;
-        fetch(`http://localhost:3001/ChangeControls/${CHG_ticket}/patches`)
+        fetch(process.env.REACT_APP_BACKEND_URL + `/ChangeControls/${CHG_ticket}/patches`)
             .then((res) => res.json())
             .then((json) => {
                 // console.log(json);

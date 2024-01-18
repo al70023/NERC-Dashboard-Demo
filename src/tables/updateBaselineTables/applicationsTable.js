@@ -16,7 +16,7 @@ export class ApplicationsTableUpdateBaseline extends Component {
     }
 
     componentDidMount() {
-        fetch('http://localhost:3001/Applications')
+        fetch(process.env.REACT_APP_BACKEND_URL + '/Applications')
             .then(res => res.json())
             .then(json => {
                 // console.log(json);

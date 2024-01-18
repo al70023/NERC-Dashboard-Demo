@@ -15,7 +15,7 @@ export class ApplicationsTable extends Component {
     componentDidMount() {
         const { params } = this.props;
         const id = params.id;
-        fetch(`http://localhost:3001/AssetInventory/${id}/applications`)
+        fetch(process.env.REACT_APP_BACKEND_URL + `/AssetInventory/${id}/applications`)
             .then((res) => res.json())
             .then((json) => {
                 // console.log(json);

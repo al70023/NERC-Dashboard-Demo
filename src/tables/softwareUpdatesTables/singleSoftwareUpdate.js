@@ -16,7 +16,7 @@ export class SingleSoftwareUpdate extends Component {
     componentDidMount() {
         const { params } = this.props;
         const patch_version = params.patch_version;
-        fetch(`http://localhost:3001/SoftwareUpdates/${patch_version}`)
+        fetch(process.env.REACT_APP_BACKEND_URL + `/SoftwareUpdates/${patch_version}`)
             .then((res) => res.json())
             .then((json) => {
                 // console.log(json);

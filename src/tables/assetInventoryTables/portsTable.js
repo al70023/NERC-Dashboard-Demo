@@ -15,7 +15,7 @@ export class PortsTable extends Component {
     componentDidMount() {
         const { params } = this.props;
         const id = params.id;
-        fetch(`http://localhost:3001/AssetInventory/${id}/ports`)
+        fetch(process.env.REACT_APP_BACKEND_URL + `/AssetInventory/${id}/ports`)
             .then((res) => res.json())
             .then((json) => {
                 // console.log(json);

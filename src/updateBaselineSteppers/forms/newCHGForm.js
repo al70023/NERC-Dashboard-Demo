@@ -72,7 +72,7 @@ function NewCHGForm({ onFormSave, savedData }) {
           formData.append('file', file);
 
           // Make an HTTP POST request using the fetch API
-          fetch('http://localhost:3001/upload', {
+          fetch(process.env.REACT_APP_BACKEND_URL + '/upload', {
             method: 'POST',
             body: formData,
           })
@@ -98,7 +98,7 @@ function NewCHGForm({ onFormSave, savedData }) {
           formData.append('file', file);
 
           // Make an HTTP POST request using the fetch API
-          fetch('http://localhost:3001/upload', {
+          fetch(process.env.REACT_APP_BACKEND_URL + '/upload', {
             method: 'POST',
             body: formData,
           })
@@ -124,7 +124,7 @@ function NewCHGForm({ onFormSave, savedData }) {
           formData.append('file', file);
 
           // Make an HTTP POST request using the fetch API
-          fetch('http://localhost:3001/upload', {
+          fetch(process.env.REACT_APP_BACKEND_URL + '/upload', {
             method: 'POST',
             body: formData,
           })
@@ -150,7 +150,7 @@ function NewCHGForm({ onFormSave, savedData }) {
           formData.append('file', file);
 
           // Make an HTTP POST request using the fetch API
-          fetch('http://localhost:3001/upload', {
+          fetch(process.env.REACT_APP_BACKEND_URL + '/upload', {
             method: 'POST',
             body: formData,
           })

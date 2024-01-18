@@ -17,7 +17,7 @@ export class SoftwareUpdatesTable extends Component {
     componentDidMount() {
         const { params } = this.props;
         const id = params.id;
-        fetch(`http://localhost:3001/AssetInventory/${id}/softwareUpdates`)
+        fetch(process.env.REACT_APP_BACKEND_URL + `/AssetInventory/${id}/softwareUpdates`)
             .then((res) => res.json())
             .then((json) => {
                 // console.log(json);

@@ -41,7 +41,7 @@ export class AssetTableUpdateBaseline extends Component {
     }
 
     componentDidMount() {
-        fetch('http://localhost:3001/AssetInventory')
+        fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory')
             .then(res => res.json())
             .then(json => {
                 // console.log(json);

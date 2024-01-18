@@ -39,7 +39,7 @@ export class ChgTable extends Component {
     }
 
     componentDidMount() {
-        fetch('http://localhost:3001/ChangeControls')
+        fetch(process.env.REACT_APP_BACKEND_URL + '/ChangeControls')
             .then(res => res.json())
             .then(json => {
                 // console.log(json);

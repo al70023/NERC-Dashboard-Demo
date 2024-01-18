@@ -22,7 +22,7 @@ export default function BaselineReport() {
     const [endDateFilter, setEndDateFilter] = useState(new Date().toISOString().split('T')[0]);
 
     useEffect(() => {
-        fetch('http://localhost:3001/ChangeControls')
+        fetch(process.env.REACT_APP_BACKEND_URL + '/ChangeControls')
             .then((res) => res.json())
             .then((json) => {
                 setChangeControlsList(json);

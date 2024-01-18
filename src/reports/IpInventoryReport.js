@@ -11,7 +11,7 @@ export default function IpInventoryReport() {
     const [groupFilterCriteria, setGroupFilterCriteria] = useState("Show All");
 
     useEffect(() => {
-        fetch('http://localhost:3001/AssetInventory')
+        fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory')
             .then((res) => res.json())
             .then((json) => {
                 setIpInventory(json);
