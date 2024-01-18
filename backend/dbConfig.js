@@ -9,7 +9,7 @@ const config = {
   ssl: {
     rejectUnauthorized: true, // Change to false if using a self-signed certificate
     // Ensure the certificate file is present in the project directory or provide the correct path
-    ca: fs.readFileSync('rds-ca-2019-root.pem').toString()
+    ca: fs.readFileSync(process.env.SL_CERT_PATHSL_CERT_PATH).toString()
   }
 };
 
