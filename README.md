@@ -1,4 +1,5 @@
 # AWS Cloud Deployed NERC IT Dashboard
+  
 ![image](https://github.com/al70023/NERC-Dashboard-Demo/assets/87347668/f6d3efe2-3ce9-4c79-99d8-e58208ebd202)
 
 A full-stack web application meant to replace common IT dashboard's such as ServiceNow.  
@@ -12,17 +13,12 @@ The Dashboard allows for:
      
 Utilizing React, Node, Express, and PostgreSQL.  
 
+### [Navigate to the Dashboard Here](http://nerc-dashboard-frontend.s3-website.us-east-2.amazonaws.com/)  
 
 ## Table of contents
-* [Link](#Link)
 * [Database Design](#database-design)
 * [AWS Cloud Network Architecture](#aws-cloud-network-architecture)
 * [Bugs](#bugs)
-	
-	
-## Link
-The AWS Cloud-hosted project can be found here:   
-http://nerc-dashboard-frontend.s3-website.us-east-2.amazonaws.com/ 
 
 
 ## Database Design
