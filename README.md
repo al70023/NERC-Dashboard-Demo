@@ -34,7 +34,7 @@ This was purely a personal choice of not limiting dependence between the two, an
 ## AWS Cloud Network Architecture
 Cloud Netowrk Design Diagram of cloud implementation of this project (current migration WIP).     
 
-![network diagram drawio](https://github.com/al70023/NERC-Dashboard-Demo/assets/87347668/2b425528-285f-410d-8e03-893f227c8bfd)
+![network diagram drawio](https://github.com/al70023/NERC-Dashboard-Demo/assets/87347668/11e66660-3e7a-4799-9682-e9095f441128)
 
 
 
