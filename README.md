@@ -1,4 +1,6 @@
 # AWS Cloud Deployed NERC IT Dashboard
+![image](https://github.com/al70023/NERC-Dashboard-Demo/assets/87347668/f6d3efe2-3ce9-4c79-99d8-e58208ebd202)
+
 A full-stack web application meant to replace common IT dashboard's such as ServiceNow.  
 The Dashboard allows for:
 - Detailed viewing between related entities
