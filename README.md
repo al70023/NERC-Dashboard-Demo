@@ -51,4 +51,6 @@ Cloud Netowrk Design Diagram of cloud implementation of this project (current mi
 4. On Update Baseline stepper, when selecting Ports to modify, "Add Port" button has no function (haven't implemented yet).   
    
 5. Implement responsiveness to UI
+
+6. Initial load of page requires a couple of refreshes to fetch and load data.
    
