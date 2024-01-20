@@ -13,7 +13,7 @@ The Dashboard allows for:
      
 Utilizing React, Node, Express, and PostgreSQL.  
 
-### [Navigate to the Dashboard Here](http://nerc-dashboard-frontend.s3-website.us-east-2.amazonaws.com/)  
+### [Navigate to the Dashboard Here](http://nerc-dashboard.com/)  
 
 ## Table of contents
 * [Database Design](#database-design)
