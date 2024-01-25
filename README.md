@@ -13,7 +13,7 @@ The Dashboard allows for:
      
 Utilizing React, Node, Express, and PostgreSQL.  
 
-### [Navigate to the Dashboard Here](http://nerc-dashboard-frontend.s3-website.us-east-2.amazonaws.com/)  
+### [Navigate to the Dashboard Here](http://nerc-dashboard.com/)  
 
 ## Table of contents
 * [Database Design](#database-design)
@@ -34,7 +34,7 @@ This was purely a personal choice of not limiting dependence between the two, an
 ## AWS Cloud Network Architecture
 Cloud Netowrk Design Diagram of cloud implementation of this project (current migration WIP).     
 
-![network diagram drawio](https://github.com/al70023/NERC-Dashboard-Demo/assets/87347668/2b425528-285f-410d-8e03-893f227c8bfd)
+![network diagram drawio](https://github.com/al70023/NERC-Dashboard-Demo/assets/87347668/11e66660-3e7a-4799-9682-e9095f441128)
 
 
 
@@ -51,4 +51,6 @@ Cloud Netowrk Design Diagram of cloud implementation of this project (current mi
 4. On Update Baseline stepper, when selecting Ports to modify, "Add Port" button has no function (haven't implemented yet).   
    
 5. Implement responsiveness to UI
+
+6. Initial load of page requires a couple of refreshes to fetch and load data.
    
