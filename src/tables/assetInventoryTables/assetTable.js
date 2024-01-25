@@ -38,12 +38,13 @@ export class AssetTable extends Component {
         assetInventory: [],
         columns: assetTableColumns
     }
-
+    
     componentDidMount() {
+        console.log(process.env.REACT_APP_BACKEND_URL);
          fetch(process.env.REACT_APP_BACKEND_URL + '/AssetInventory')
             .then(res => res.json())
             .then(json => {
-                // console.log(json);
+                console.log(json);
                 this.setState({
                     assetInventory: json
                 });
